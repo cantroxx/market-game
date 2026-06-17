@@ -131,6 +131,34 @@ const DISTRICTS = [
   { id:"seocho",name:"서초구",a:"동남" },{ id:"gangnam",name:"강남구",a:"동남" },{ id:"songpa",name:"송파구",a:"동남" },{ id:"gangdong",name:"강동구",a:"동남" },
 ];
 
+const DISTRICT_COORDS = {
+  jongno: { x: 420, y: 300 },
+  jung: { x: 480, y: 390 },
+  yongsan: { x: 460, y: 530 },
+  seongdong: { x: 640, y: 490 },
+  gwangjin: { x: 780, y: 540 },
+  dongdaemun: { x: 720, y: 380 },
+  jungnang: { x: 880, y: 320 },
+  seongbuk: { x: 620, y: 260 },
+  gangbuk: { x: 580, y: 150 },
+  dobong: { x: 660, y: 80 },
+  nowon: { x: 820, y: 120 },
+  eunpyeong: { x: 260, y: 200 },
+  seodaemun: { x: 320, y: 340 },
+  mapo: { x: 220, y: 460 },
+  yangcheon: { x: 100, y: 640 },
+  gangseo: { x: 60, y: 480 },
+  guro: { x: 120, y: 760 },
+  geumcheon: { x: 240, y: 880 },
+  yeongdeungpo: { x: 280, y: 620 },
+  dongjak: { x: 430, y: 680 },
+  gwanak: { x: 410, y: 800 },
+  seocho: { x: 580, y: 780 },
+  gangnam: { x: 720, y: 740 },
+  songpa: { x: 860, y: 720 },
+  gangdong: { x: 920, y: 560 }
+};
+
 // ─── Locations ───
 const ALL_LOCATIONS = [
   { id:"gwangjang", name:"광장시장", type:"market", dist:"jongno", emoji:"🏮", x:55,y:26, desc:"먹거리가 유명한 전통시장", spec:"고기·먹거리 최저가", color:"#E53935", mode:"easy" },
@@ -380,6 +408,7 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
   const [scale, setScale] = useState(1.1);
   const [isDragging, setIsDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
+  const [hoveredPin, setHoveredPin] = useState(null);
 
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -401,6 +430,27 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
     setScale(nextScale);
   };
 
+  // 출발지 좌표 구하기
+  const startCoord = DISTRICT_COORDS[district?.id] || { x: 500, y: 500 };
+
+  // 선택된 핀의 좌표 구하기
+  let selX = 0, selY = 0;
+  if (selPin) {
+    const selLoc = locations.find(l => l.id === selPin);
+    if (selLoc) {
+      selX = selLoc.x * 10;
+      selY = selLoc.y * 10;
+      if (selLoc.id === "gwangjang") { selX = 680; selY = 460; }
+      else if (selLoc.id === "mangwon") { selX = 150; selY = 640; }
+      else if (selLoc.id === "namdaemun") { selX = 560; selY = 390; }
+      else if (selLoc.id === "mart_a") { selX = 800; selY = 790; }
+      else if (selLoc.id === "gyeongdong") { selX = 850; selY = 300; }
+      else if (selLoc.id === "tongin") { selX = 200; selY = 320; }
+      else if (selLoc.id === "mart_b") { selX = 320; selY = 820; }
+      else if (selLoc.id === "mart_c") { selX = 800; selY = 180; }
+    }
+  }
+
   return (
     <div 
       style={{ width: "100%", height: 450, overflow: "hidden", borderRadius: 24, border: `3.5px solid ${C.grayLight}`, background: C.mapLand, position: "relative", cursor: isDragging ? "grabbing" : "grab", boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)" }}
@@ -418,12 +468,75 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
           {/* 서울 그림 지도 일러스트 배경 */}
           <image href="/images/seoul_game_map.png" x="0" y="0" width="1000" height="1000" />
 
-          {/* 상점 핀 렌더링 (그림 지도 라벨 매칭 보정 좌표) */}
-          {locations.map(loc=>{
+          {/* 한글 랜드마크 및 지역 텍스트 */}
+          <g opacity="0.8" style={{ pointerEvents: "none" }}>
+            <text x="520" y="140" fontSize="14" fill="#2E7D32" fontWeight="900" textAnchor="middle">북한산 국립공원</text>
+            <text x="500" y="445" fontSize="13" fill="#37474F" fontWeight="900" textAnchor="middle">🗼 N서울타워</text>
+            <text x="460" y="270" fontSize="12" fill="#5D4037" fontWeight="900" textAnchor="middle">🏯 경복궁</text>
+            <text x="490" y="565" fontSize="16" fill="#1565C0" fontWeight="900" letterSpacing="6" textAnchor="middle">한 강</text>
+
+            <text x="180" y="480" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">마포</text>
+            <text x="720" y="770" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">강남</text>
+            <text x="580" y="810" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">서초</text>
+            <text x="480" y="380" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">중구</text>
+            <text x="400" y="310" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">종로</text>
+            <text x="820" y="140" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">노원</text>
+            <text x="280" y="640" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">영등포</text>
+          </g>
+
+          {/* 출발지에서 선택한 핀으로의 경로선 및 교통비 배지 */}
+          {selPin && district && (
+            <g>
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="25" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill={C.red} />
+                </marker>
+              </defs>
+              <path 
+                d={`M ${startCoord.x} ${startCoord.y} L ${selX} ${selY}`} 
+                fill="none" 
+                stroke={C.red} 
+                strokeWidth="4.5" 
+                strokeDasharray="8 6" 
+                markerEnd="url(#arrow)" 
+                opacity="0.85" 
+              />
+              {(() => {
+                const midX = (startCoord.x + selX) / 2;
+                const midY = (startCoord.y + selY) / 2;
+                const selLoc = locations.find(l => l.id === selPin);
+                const tc = selLoc ? calcTC(district.id, selLoc.dist) : 0;
+                const badgeText = tc === 0 ? "🚶 도보이동" : `🚇 교통비 ${fmt(tc)}`;
+                const badgeW = tc === 0 ? 76 : 100;
+                const badgeH = 22;
+                return (
+                  <g transform={`translate(${midX - badgeW/2}, ${midY - badgeH/2})`}>
+                    <rect width={badgeW} height={badgeH} rx={11} fill={C.white} stroke={C.red} strokeWidth="2.5" />
+                    <text x={badgeW/2} y={badgeH/2 + 0.5} fontSize="10" fill={C.text} fontWeight="900" textAnchor="middle" dominantBaseline="central">
+                      {badgeText}
+                    </text>
+                  </g>
+                );
+              })()}
+            </g>
+          )}
+
+          {/* 출발지 3D 핀 렌더링 */}
+          {district && (
+            <g transform={`translate(${startCoord.x}, ${startCoord.y})`} style={{ pointerEvents: "none" }}>
+              <image href="/images/start_pin.png" x="-25" y="-50" width="50" height="50" />
+              <rect x="-40" y="5" width="80" height="18" rx="9" fill={C.red} stroke={C.white} strokeWidth="1.5" />
+              <text x="0" y="14" fontSize="10" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">
+                📍 {district.name}
+              </text>
+            </g>
+          )}
+
+          {/* 상점 핀 렌더링 */}
+          {locations.map(loc => {
             let cx = loc.x * 10;
             let cy = loc.y * 10;
             
-            // 일러스트 지도 지명 라벨 위치 매칭 보정 좌표 (1000x1000 기준)
             if (loc.id === "gwangjang") { cx = 680; cy = 460; }
             else if (loc.id === "mangwon") { cx = 150; cy = 640; }
             else if (loc.id === "namdaemun") { cx = 560; cy = 390; }
@@ -433,43 +546,64 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
             else if (loc.id === "mart_b") { cx = 320; cy = 820; }
             else if (loc.id === "mart_c") { cx = 800; cy = 180; }
 
-            const iv=visited.includes(loc.id), isSel=selPin===loc.id;
+            const iv = visited.includes(loc.id), isSel = selPin === loc.id;
             const tc = calcTC(district.id, loc.dist);
+            const isHovered = hoveredPin === loc.id;
+            const showTooltip = isSel || isHovered;
 
-            // Name tag dimensions
-            const nw = 96;
-            const nh = 26;
-            const nx = cx - nw/2;
-            const ny = cy - nh/2;
-            
-            // Cost tag dimensions
-            const cw = 74;
-            const ch = 18;
-            const cx_cost = cx - cw/2;
-            const cy_cost = cy + nh/2 + 4;
+            const pw = 50;
+            const ph = 50;
+            const px = cx - pw/2;
+            const py = cy - ph;
+
+            const pinImg = loc.type === "market" ? "/images/traditional_market_pin.png" : "/images/mart_pin.png";
 
             return (
-              <g key={loc.id} onClick={()=>!iv&&onPin(loc)} className={`map-pin-hover ${isSel ? "map-pin-active" : ""}`} style={{ cursor:iv?"default":"pointer" }} opacity={iv?0.45:1}>
-                {/* Shadow */}
-                <rect x={nx} y={ny + 3} width={nw} height={nh} rx={12} fill="rgba(0,0,0,0.1)"/>
-                
-                {/* Market Name Card */}
-                <rect x={nx} y={ny} width={nw} height={nh} rx={12} fill={C.white} stroke={loc.color} strokeWidth={isSel ? 4.5 : 2.5} />
-                <text x={cx} y={cy + 1} fontSize="12" fill={C.text} fontWeight="900" textAnchor="middle" dominantBaseline="central">
-                  {loc.name}
-                </text>
-                
-                {/* Cost Pill */}
-                <rect x={cx_cost} y={cy_cost} width={cw} height={ch} rx={9} fill={tc===0?C.green:C.blueDark} stroke="rgba(0,0,0,0.1)" strokeWidth="1"/>
-                <text x={cx} y={cy_cost + ch/2 + 0.5} fontSize="10" fill={C.white} fontWeight="800" textAnchor="middle" dominantBaseline="central">
-                  {tc===0?"🚶도보":`🚇${fmt(tc)}`}
-                </text>
-                
-                {/* Visited Check Badge (top right) */}
+              <g 
+                key={loc.id} 
+                onClick={() => !iv && onPin(loc)} 
+                onMouseEnter={() => !iv && setHoveredPin(loc.id)}
+                onMouseLeave={() => setHoveredPin(null)}
+                className={`map-pin-hover ${isSel ? "map-pin-active" : ""}`} 
+                style={{ cursor: iv ? "default" : "pointer" }} 
+                opacity={iv ? 0.45 : 1}
+              >
+                {/* 3D 부루마블 핀 이미지 */}
+                <image href={pinImg} x={px} y={py} width={pw} height={ph} />
+
+                {/* 핀 이름 (기본 노출용 소형 말풍선) */}
+                {!showTooltip && (
+                  <g transform={`translate(${cx - 40}, ${cy + 4})`}>
+                    <rect width="80" height="18" rx="9" fill={C.white} stroke={loc.color} strokeWidth="1.5" />
+                    <text x="40" y="9.5" fontSize="10" fill={C.text} fontWeight="900" textAnchor="middle" dominantBaseline="central">
+                      {loc.name}
+                    </text>
+                  </g>
+                )}
+
+                {/* 상세 툴팁 카드 (호버/선택 시) */}
+                {showTooltip && (
+                  <g transform={`translate(${cx - 75}, ${cy - ph - 65})`} style={{ pointerEvents: "none" }}>
+                    <rect x="0" y="3" width="150" height="56" rx="12" fill="rgba(0,0,0,0.15)" />
+                    <rect x="0" y="0" width="150" height="56" rx="12" fill={C.white} stroke={loc.color} strokeWidth="3" />
+                    
+                    <text x="75" y="14" fontSize="11" fill={C.text} fontWeight="900" textAnchor="middle" dominantBaseline="central">
+                      {loc.name}
+                    </text>
+                    <text x="75" y="29" fontSize="9" fill={loc.color} fontWeight="800" textAnchor="middle" dominantBaseline="central">
+                      ✨ {loc.spec}
+                    </text>
+                    <text x="75" y="43" fontSize="9" fill={C.textLight} fontWeight="800" textAnchor="middle" dominantBaseline="central">
+                      {tc === 0 ? "🚶 도보 이동 가능" : `🚇 교통비: ${fmt(tc)}`}
+                    </text>
+                  </g>
+                )}
+
+                {/* 방문 완료 체크 배지 */}
                 {iv && (
-                  <g transform={`translate(${nx + nw - 2}, ${ny + 2})`}>
-                    <circle cx="0" cy="0" r="10" fill={C.green} stroke={C.white} strokeWidth="2"/>
-                    <text x="0" y="1" fontSize="10" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">✓</text>
+                  <g transform={`translate(${cx + 12}, ${cy - ph + 8})`}>
+                    <circle cx="0" cy="0" r="9" fill={C.green} stroke={C.white} strokeWidth="1.5"/>
+                    <text x="0" y="1" fontSize="9" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">✓</text>
                   </g>
                 )}
               </g>
