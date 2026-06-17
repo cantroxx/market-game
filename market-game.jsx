@@ -105,6 +105,19 @@ function playSFX(type) {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
       osc.start(now);
       osc.stop(now + 0.45);
+    } else if (type === "dice") {
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.setValueAtTime(450, now + 0.05);
+      osc.frequency.setValueAtTime(250, now + 0.1);
+      osc.frequency.setValueAtTime(500, now + 0.15);
+      osc.frequency.setValueAtTime(200, now + 0.2);
+      osc.frequency.setValueAtTime(600, now + 0.25);
+      osc.frequency.setValueAtTime(350, now + 0.35);
+      gain.gain.setValueAtTime(0.08, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
+      osc.start(now);
+      osc.stop(now + 0.55);
     }
   } catch (e) {
     console.error("Audio error", e);
@@ -377,35 +390,62 @@ function DistrictScreen({ onSelect }) {
 
 function BriefingScreen({ mission, district, difficulty, onGo }) {
   return (
-    <div>
-      <div style={{ textAlign:"center", marginBottom:16 }}>
-        <span style={{ ...S.tag(C.pinkLight,C.pink), fontSize:13 }}>{mission.emoji} {mission.title}</span>
+    <div style={{ 
+      backgroundImage: "url('/images/board_game_card_frame.png')", 
+      backgroundSize: "100% 100%", 
+      padding: "60px 45px 50px 45px", 
+      boxShadow: "0 12px 28px rgba(0,0,0,0.12)",
+      borderRadius: 24,
+      backgroundPosition: "center"
+    }}>
+      <div style={{ textAlign:"center", marginBottom:12 }}>
+        <span style={{ ...S.tag(C.pinkLight,C.pink), fontSize:14, fontWeight: "900", padding: "6px 16px", borderRadius: 12 }}>
+          {mission.emoji} {mission.title}
+        </span>
       </div>
-      <MomBubble expression="normal" text={MOM_BRIEFING[mission.id]} size={80} />
-      <div style={{ ...S.card, marginTop:16, padding:16 }}>
-        <div style={{ fontSize:14, fontWeight:900, marginBottom:8, color: C.pink }}>🛒 사와야 할 물건 목록</div>
+      
+      <MomBubble expression="normal" text={MOM_BRIEFING[mission.id]} size={72} />
+      
+      <div style={{ ...S.card, marginTop:12, padding:14, background: "rgba(255,255,255,0.9)", border: `2.5px dashed ${C.pink}` }}>
+        <div style={{ fontSize:13, fontWeight:900, marginBottom:6, color: C.pink }}>🛒 사와야 할 물건 목록</div>
         <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-          {mission.required.map((r,i)=><span key={i} style={S.tag(C.pinkLight,C.pink)}>{r.emoji} {r.name}</span>)}
-          {mission.optional.map((o,i)=><span key={`o${i}`} style={S.tag(C.orangeLight,C.orange)}>{o.emoji} {o.name} (선택)</span>)}
+          {mission.required.map((r,i)=><span key={i} style={{ ...S.tag(C.pinkLight,C.pink), fontSize:11 }}>{r.emoji} {r.name}</span>)}
+          {mission.optional.map((o,i)=><span key={`o${i}`} style={{ ...S.tag(C.orangeLight,C.orange), fontSize:11 }}>{o.emoji} {o.name} (선택)</span>)}
         </div>
       </div>
-      <div style={{ ...S.card, marginTop:10, padding:14, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <span style={{ fontSize:14, fontWeight: 700 }}>💰 지원받은 용돈</span>
-        <span style={{ fontSize:20, fontWeight:900, color:C.pink }}>{fmt(mission.budget)}</span>
+      
+      <div style={{ ...S.card, marginTop:8, padding:12, display:"flex", justifyContent:"space-between", alignItems:"center", background: "rgba(255,255,255,0.9)" }}>
+        <span style={{ fontSize:13, fontWeight: 800, color: C.textLight }}>💰 지원받은 용돈</span>
+        <span style={{ fontSize:18, fontWeight:900, color:C.pink }}>{fmt(mission.budget)}</span>
       </div>
-      <div style={{ display:"flex", gap:8, marginTop:12 }}>
-        <div style={{ ...S.tag(C.pinkLight,C.pink), fontSize:12 }}>📍 {district.name} 출발</div>
-        <div style={{ ...S.tag(difficulty==="hard"?C.redLight:C.greenLight, difficulty==="hard"?C.red:C.green), fontSize:12 }}>{DIFF[difficulty].label} 난이도</div>
+      
+      <div style={{ display:"flex", gap:6, marginTop:10 }}>
+        <div style={{ ...S.tag(C.pinkLight,C.pink), fontSize:11, flex: 1, textAlign: "center" }}>📍 {district.name} 출발</div>
+        <div style={{ ...S.tag(difficulty==="hard"?C.redLight:C.greenLight, difficulty==="hard"?C.red:C.green), fontSize:11, flex: 1, textAlign: "center" }}>{DIFF[difficulty].label} 난이도</div>
       </div>
-      <button onClick={onGo} className="clay-btn" style={{ ...S.btn(C.pink), width:"100%", marginTop:20, fontSize:18, padding:"16px 0" }}>심부름 출발! 🏃</button>
+      
+      <button onClick={onGo} className="clay-btn" style={{ ...S.btn(C.pink), width:"100%", marginTop:16, fontSize:16, padding:"12px 0", borderRadius: 14 }}>
+        심부름 출발! 🏃
+      </button>
     </div>
   );
 }
 
+// ─── Seoul Map Boundary Clamp Utility ───
+function clampPan(x, y, s) {
+  // 지도 크기 1000x1000, 뷰포트 크기 가로 800, 세로 450 기준
+  const minX = 800 - 1000 * s;
+  const minY = 450 - 1000 * s;
+  return {
+    x: Math.min(0, Math.max(minX, x)),
+    y: Math.min(0, Math.max(minY, y))
+  };
+}
+
 // ─── Seoul Map ───
 function SeoulMap({ locations, onPin, visited, selPin, district }) {
-  const [pan, setPan] = useState({ x: -100, y: -100 });
   const [scale, setScale] = useState(1.1);
+  const [pan, setPan] = useState(() => clampPan(-100, -100, 1.1));
   const [isDragging, setIsDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
   const [hoveredPin, setHoveredPin] = useState(null);
@@ -417,7 +457,9 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    setPan({ x: e.clientX - start.x, y: e.clientY - start.y });
+    const nextX = e.clientX - start.x;
+    const nextY = e.clientY - start.y;
+    setPan(clampPan(nextX, nextY, scale));
   };
 
   const handleMouseUp = () => {
@@ -426,8 +468,9 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
   const handleWheel = (e) => {
     e.preventDefault();
-    const nextScale = Math.min(2.5, Math.max(0.7, scale - e.deltaY * 0.0015));
+    const nextScale = Math.min(2.5, Math.max(1.0, scale - e.deltaY * 0.0015));
     setScale(nextScale);
+    setPan(clampPan(pan.x, pan.y, nextScale));
   };
 
   // 출발지 좌표 구하기
@@ -561,19 +604,15 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
             return (
               <g 
                 key={loc.id} 
-                onClick={() => !iv && onPin(loc)} 
-                onMouseEnter={() => !iv && setHoveredPin(loc.id)}
-                onMouseLeave={() => setHoveredPin(null)}
                 className={`map-pin-hover ${isSel ? "map-pin-active" : ""}`} 
-                style={{ cursor: iv ? "default" : "pointer" }} 
                 opacity={iv ? 0.45 : 1}
               >
-                {/* 3D 부루마블 핀 이미지 */}
-                <image href={pinImg} x={px} y={py} width={pw} height={ph} />
+                {/* 3D 부루마블 핀 이미지 (마우스 반응 차단) */}
+                <image href={pinImg} x={px} y={py} width={pw} height={ph} style={{ pointerEvents: "none" }} />
 
-                {/* 핀 이름 (기본 노출용 소형 말풍선) */}
+                {/* 핀 이름 (기본 노출용 소형 말풍선) (마우스 반응 차단) */}
                 {!showTooltip && (
-                  <g transform={`translate(${cx - 40}, ${cy + 4})`}>
+                  <g transform={`translate(${cx - 40}, ${cy + 4})`} style={{ pointerEvents: "none" }}>
                     <rect width="80" height="18" rx="9" fill={C.white} stroke={loc.color} strokeWidth="1.5" />
                     <text x="40" y="9.5" fontSize="10" fill={C.text} fontWeight="900" textAnchor="middle" dominantBaseline="central">
                       {loc.name}
@@ -581,7 +620,7 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
                   </g>
                 )}
 
-                {/* 상세 툴팁 카드 (호버/선택 시) */}
+                {/* 상세 툴팁 카드 (호버/선택 시) (마우스 반응 차단) */}
                 {showTooltip && (
                   <g transform={`translate(${cx - 75}, ${cy - ph - 65})`} style={{ pointerEvents: "none" }}>
                     <rect x="0" y="3" width="150" height="56" rx="12" fill="rgba(0,0,0,0.15)" />
@@ -599,13 +638,26 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
                   </g>
                 )}
 
-                {/* 방문 완료 체크 배지 */}
+                {/* 방문 완료 체크 배지 (마우스 반응 차단) */}
                 {iv && (
-                  <g transform={`translate(${cx + 12}, ${cy - ph + 8})`}>
+                  <g transform={`translate(${cx + 12}, ${cy - ph + 8})`} style={{ pointerEvents: "none" }}>
                     <circle cx="0" cy="0" r="9" fill={C.green} stroke={C.white} strokeWidth="1.5"/>
                     <text x="0" y="1" fontSize="9" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">✓</text>
                   </g>
                 )}
+
+                {/* 실질적 마우스 이벤트 감지 투명 히트박스 (레이아웃 변동 없는 이벤트 수신기) */}
+                <rect
+                  x={cx - 40}
+                  y={cy - 50}
+                  width="80"
+                  height="72"
+                  fill="transparent"
+                  style={{ cursor: iv ? "default" : "pointer" }}
+                  onClick={() => !iv && onPin(loc)}
+                  onMouseEnter={() => !iv && setHoveredPin(loc.id)}
+                  onMouseLeave={() => setHoveredPin(null)}
+                />
               </g>
             );
           })}
@@ -1004,68 +1056,75 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
     : "linear-gradient(135deg,#ECEFF1,#F5F5F5)";
 
   return (
-    <div>
+    <div style={{ 
+      backgroundImage: "url('/images/board_game_card_frame.png')", 
+      backgroundSize: "100% 100%", 
+      padding: "60px 45px 50px 45px", 
+      boxShadow: "0 12px 28px rgba(0,0,0,0.12)",
+      borderRadius: 24,
+      backgroundPosition: "center"
+    }}>
       <MomResult mission={mission} cart={cart} spent={spent} tBought={tBought} tResisted={tResisted} rational={rational} mood={mood} />
 
-      <div style={{ textAlign:"center", padding:"24px 16px", borderRadius:24, marginBottom:16, background:finalComboBg, boxShadow: "0 8px 0px #ECEFF1, 0 8px 24px rgba(0,0,0,0.08)", border: `3.5px solid ${C.grayLight}` }}>
-        <div style={{ fontSize:48 }}>{combo.e}</div>
-        <h2 style={{ fontSize:20, fontWeight:900, margin:"4px 0", color:C.text }}>{combo.t}</h2>
-        <p style={{ fontSize:14, color:C.grayDark, margin:"8px 0 0", lineHeight:1.6, fontWeight: "bold" }}>{combo.m}</p>
-        <div style={{ fontSize:11, color:C.textLight, marginTop:8, fontWeight: "bold" }}>📍 {district.name} · {DIFF[difficulty].label}</div>
+      <div style={{ textAlign:"center", padding:"16px 12px", borderRadius:16, marginBottom:12, background:finalComboBg, border: `2.5px solid ${C.grayLight}` }}>
+        <div style={{ fontSize:32 }}>{combo.e}</div>
+        <h2 style={{ fontSize:16, fontWeight:900, margin:"2px 0", color:C.text }}>{combo.t}</h2>
+        <p style={{ fontSize:12, color:C.grayDark, margin:"4px 0 0", lineHeight:1.5, fontWeight: "bold" }}>{combo.m}</p>
+        <div style={{ fontSize:10, color:C.textLight, marginTop:4, fontWeight: "bold" }}>📍 {district.name} · {DIFF[difficulty].label}</div>
       </div>
 
-      <div style={{ display:"flex", gap:10, marginBottom:14 }}>
-        <div style={{ flex:1, background:C.white, borderRadius:20, padding:14, textAlign:"center", boxShadow:"0 6px 0px #ECEFF1, 0 8px 16px rgba(0,0,0,0.04)", border:`3.5px solid ${rational>=70?C.green:rational>=50?C.orange:C.red}` }}>
-          <div style={{ fontSize:12, fontWeight:800, color:C.textLight }}>🧠 합리적 선택</div>
-          <div style={{ fontSize:34, fontWeight:900, color:rational>=70?C.green:rational>=50?C.orange:C.red }}>{rational}</div>
+      <div style={{ display:"flex", gap:8, marginBottom:12 }}>
+        <div style={{ flex:1, background:C.white, borderRadius:16, padding:10, textAlign:"center", border:`2.5px solid ${rational>=70?C.green:rational>=50?C.orange:C.red}` }}>
+          <div style={{ fontSize:11, fontWeight:800, color:C.textLight }}>🧠 합리적 선택</div>
+          <div style={{ fontSize:24, fontWeight:900, color:rational>=70?C.green:rational>=50?C.orange:C.red }}>{rational}</div>
         </div>
-        <div style={{ flex:1, background:C.white, borderRadius:20, padding:14, textAlign:"center", boxShadow:"0 6px 0px #ECEFF1, 0 8px 16px rgba(0,0,0,0.04)", border:`3.5px solid ${mood>=65?C.pink:mood>=45?C.orange:C.gray}` }}>
-          <div style={{ fontSize:12, fontWeight:800, color:C.textLight }}>💛 마음 만족도</div>
-          <div style={{ fontSize:34, fontWeight:900, color:mood>=65?C.pink:mood>=45?C.orange:C.gray }}>{mood}</div>
+        <div style={{ flex:1, background:C.white, borderRadius:16, padding:10, textAlign:"center", border:`2.5px solid ${mood>=65?C.pink:mood>=45?C.orange:C.gray}` }}>
+          <div style={{ fontSize:11, fontWeight:800, color:C.textLight }}>💛 마음 만족도</div>
+          <div style={{ fontSize:24, fontWeight:900, color:mood>=65?C.pink:mood>=45?C.orange:C.gray }}>{mood}</div>
         </div>
       </div>
 
       {potentialSavings > 0 && (
-        <div style={{ ...S.card, marginBottom: 14, border: `3.5px solid ${C.green}`, background: C.greenLight }}>
-          <h3 style={{ fontSize: 14, fontWeight: 900, color: C.greenDark, margin: "0 0 8px" }}>💡 장보기 복기 피드백</h3>
-          <p style={{ margin: "0 0 12px", fontSize: 13, lineHeight: 1.6, color: C.text, fontWeight: 600 }}>
+        <div style={{ ...S.card, marginBottom: 12, padding: 12, border: `2.5px solid ${C.green}`, background: C.greenLight }}>
+          <h3 style={{ fontSize: 13, fontWeight: 900, color: C.greenDark, margin: "0 0 4px" }}>💡 장보기 복기 피드백</h3>
+          <p style={{ margin: "0 0 8px", fontSize: 12, lineHeight: 1.5, color: C.text, fontWeight: 600 }}>
             계획을 최적으로 세웠다면 <b>{fmt(potentialSavings)}</b>을 더 아껴서 총 <b>{fmt(bestCost)}</b>에 해결할 수 있었어요!
           </p>
-          <div style={{ fontSize: 12, color: C.text, fontWeight: "bold" }}>
-            <b>엄마가 권장하는 최적의 코스:</b>
-            <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
+          <div style={{ fontSize: 11, color: C.text, fontWeight: "bold" }}>
+            <b>최적의 장보기 코스:</b>
+            <div style={{ display: "flex", gap: 4, marginTop: 4, flexWrap: "wrap" }}>
               {bestLocs.map((loc, i) => (
-                <span key={i} style={S.tag(loc.color, C.white)}>{loc.emoji} {loc.name}</span>
+                <span key={i} style={{ ...S.tag(loc.color, C.white), fontSize: 10 }}>{loc.emoji} {loc.name}</span>
               ))}
             </div>
           </div>
         </div>
       )}
 
-      <div style={{ ...S.card, marginBottom:14 }}>
-        <h3 style={{ fontSize:14, fontWeight:900, margin:"0 0 10px" }}>🧠 합리적 선택 점수</h3>
+      <div style={{ ...S.card, marginBottom:12, padding: 12 }}>
+        <h3 style={{ fontSize:13, fontWeight:900, margin:"0 0 8px" }}>🧠 합리적 선택 점수</h3>
         <SB label="미션 완료" score={rM} max={40} desc={`필수 ${reqB.length}/${mission.required.length}개`} color={C.green}/>
         <SB label="예산 관리" score={rB} max={25} desc={`${fmt(rem)} 절약`} color={C.blue}/>
         <SB label="총비용 비교" score={rC} max={25} desc={`최적가 ${cheapN}건`} color={C.orange}/>
         <SB label="유혹 저항" score={rT} max={10} desc={tBought.length>0?`불필요 ${tBought.length}건`:"잘 참았어요!"} color={C.purple}/>
       </div>
 
-      <div style={{ ...S.card, marginBottom:14, background:"#FFF8F8" }}>
-        <h3 style={{ fontSize:14, fontWeight:900, margin:"0 0 10px" }}>💛 마음 분석</h3>
-        <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
-          {allReq && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.greenLight, borderRadius:8 }}><span>✅ 필수 모두 구매</span><span style={{ color:C.green, fontWeight:700 }}>+15</span></div>}
-          {notB.length>0 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.redLight, borderRadius:8 }}><span>😰 {notB.map(n=>n.name).join(", ")} 못 삼</span><span style={{ color:C.red, fontWeight:700 }}>-{notB.length*10}</span></div>}
-          {tBought.length>0 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.orangeLight, borderRadius:8 }}><span>😋 {tBought.map(t=>t.name).join(", ")}</span><span style={{ color:C.orange, fontWeight:700 }}>+{tBought.length*12}</span></div>}
-          {tResisted>0 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.pinkLight, borderRadius:8 }}><span>😔 {tResisted}번 참음 (아쉬움)</span><span style={{ color:C.pink, fontWeight:700 }}>-{tResisted*8}</span></div>}
-          {rem>=mission.budget*0.3 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.greenLight, borderRadius:8 }}><span>😌 돈 넉넉 (안심)</span><span style={{ color:C.green, fontWeight:700 }}>+8</span></div>}
-          {difficulty==="hard" && stamina<30 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.redLight, borderRadius:8 }}><span>😫 너무 피곤해요</span><span style={{ color:C.red, fontWeight:700 }}>-8</span></div>}
-          {difficulty==="hard" && stamina>=60 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.greenLight, borderRadius:8 }}><span>💪 체력 여유 (기분 좋음)</span><span style={{ color:C.green, fontWeight:700 }}>+5</span></div>}
+      <div style={{ ...S.card, marginBottom:12, padding: 12, background:"#FFF8F8" }}>
+        <h3 style={{ fontSize:13, fontWeight:900, margin:"0 0 8px" }}>💛 마음 분석</h3>
+        <div style={{ display:"flex", flexDirection:"column", gap:4 }}>
+          {allReq && <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, padding:"4px 8px", background:C.greenLight, borderRadius:8 }}><span>✅ 필수 모두 구매</span><span style={{ color:C.green, fontWeight:700 }}>+15</span></div>}
+          {notB.length>0 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, padding:"4px 8px", background:C.redLight, borderRadius:8 }}><span>😰 {notB.map(n=>n.name).join(", ")} 못 삼</span><span style={{ color:C.red, fontWeight:700 }}>-{notB.length*10}</span></div>}
+          {tBought.length>0 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, padding:"4px 8px", background:C.orangeLight, borderRadius:8 }}><span>😋 {tBought.map(t=>t.name).join(", ")}</span><span style={{ color:C.orange, fontWeight:700 }}>+{tBought.length*12}</span></div>}
+          {tResisted>0 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, padding:"4px 8px", background:C.pinkLight, borderRadius:8 }}><span>😔 {tResisted}번 참음 (아쉬움)</span><span style={{ color:C.pink, fontWeight:700 }}>-{tResisted*8}</span></div>}
+          {rem>=mission.budget*0.3 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, padding:"4px 8px", background:C.greenLight, borderRadius:8 }}><span>😌 돈 넉넉 (안심)</span><span style={{ color:C.green, fontWeight:700 }}>+8</span></div>}
+          {difficulty==="hard" && stamina<30 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, padding:"4px 8px", background:C.redLight, borderRadius:8 }}><span>😫 너무 피곤해요</span><span style={{ color:C.red, fontWeight:700 }}>-8</span></div>}
+          {difficulty==="hard" && stamina>=60 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, padding:"4px 8px", background:C.greenLight, borderRadius:8 }}><span>💪 체력 여유</span><span style={{ color:C.green, fontWeight:700 }}>+5</span></div>}
         </div>
       </div>
 
-      <div style={{ ...S.card, marginBottom:14, background:"linear-gradient(135deg,#FFF9C4,#FFF3E0)", border:`3.5px solid ${C.gold}`, boxShadow: "0 8px 0px #FFF3E0, 0 8px 24px rgba(0,0,0,0.04)" }}>
-        <div style={{ fontSize:14, fontWeight:900, color:C.grayDark, marginBottom:6 }}>💭 친구와 이야기해 봐요</div>
-        <div style={{ fontSize:13, lineHeight:1.8, color:C.text, fontWeight: 600 }}>
+      <div style={{ ...S.card, marginBottom:12, padding: 12, background:"linear-gradient(135deg,#FFF9C4,#FFF3E0)", border:`2.5px solid ${C.gold}` }}>
+        <div style={{ fontSize:13, fontWeight:900, color:C.grayDark, marginBottom:4 }}>💭 친구와 이야기해 봐요</div>
+        <div style={{ fontSize:12, lineHeight:1.6, color:C.text, fontWeight: 600 }}>
           {rH&&!mH?"\"합리적으로 잘 골랐는데 왜 아쉬운 기분이 들까요?\""
             :!rH&&mH?"\"기분은 좋은데 예산이 부족했어요. 둘 다 만족하려면?\""
             :rH&&mH?"\"어떤 점이 합리적이면서도 기분 좋게 만들었을까요?\""
@@ -1073,16 +1132,67 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
         </div>
       </div>
 
-      <div style={{ ...S.card, marginBottom:14 }}>
-        <h3 style={{ fontSize:14, fontWeight:900, margin:"0 0 8px" }}>🧾 영수증</h3>
-        {transportSpent>0 && <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:`1px solid ${C.grayLight}`, fontSize:12, color:C.blueDark }}><span>🚇 교통비</span><span style={{ fontWeight:600 }}>{fmt(transportSpent)}</span></div>}
-        {cart.map((ci,i)=>(<div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:`1px solid ${C.grayLight}`, fontSize:12 }}><span>{ci.emoji} {ci.name} <span style={{ fontSize:10, color:C.textLight }}>@{ci.locationName}</span></span><span style={{ fontWeight:600 }}>{fmt(ci.pricePaid)}</span></div>))}
-        {tBought.map((t,i)=>(<div key={`t${i}`} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", fontSize:12, color:C.red }}><span>{t.emoji} {t.name}</span><span style={{ fontWeight:600 }}>{fmt(t.price)}</span></div>))}
-        <div style={{ display:"flex", justifyContent:"space-between", padding:"6px 0 0", marginTop:4, borderTop:`2.5px solid ${C.text}`, fontWeight:900, fontSize:14 }}><span>합계</span><span>{fmt(spent)}</span></div>
-        <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:C.green, fontWeight:900, marginTop:2 }}><span>남은 돈</span><span>{fmt(rem)}</span></div>
+      <div style={{ ...S.card, marginBottom:12, padding: 12 }}>
+        <h3 style={{ fontSize:13, fontWeight:900, margin:"0 0 8px" }}>🧾 영수증</h3>
+        {transportSpent>0 && <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:`1px solid ${C.grayLight}`, fontSize:11, color:C.blueDark }}><span>🚇 교통비</span><span style={{ fontWeight:600 }}>{fmt(transportSpent)}</span></div>}
+        {cart.map((ci,i)=>(<div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:`1px solid ${C.grayLight}`, fontSize:11 }}><span>{ci.emoji} {ci.name} <span style={{ fontSize:10, color:C.textLight }}>@{ci.locationName}</span></span><span style={{ fontWeight:600 }}>{fmt(ci.pricePaid)}</span></div>))}
+        {tBought.map((t,i)=>(<div key={`t${i}`} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", fontSize:11, color:C.red }}><span>{t.emoji} {t.name}</span><span style={{ fontWeight:600 }}>{fmt(t.price)}</span></div>))}
+        <div style={{ display:"flex", justifyContent:"space-between", padding:"6px 0 0", marginTop:4, borderTop:`2px solid ${C.text}`, fontWeight:900, fontSize:13 }}><span>합계</span><span>{fmt(spent)}</span></div>
+        <div style={{ display:"flex", justifyContent:"space-between", fontSize:11, color:C.green, fontWeight:900, marginTop:2 }}><span>남은 돈</span><span>{fmt(rem)}</span></div>
       </div>
 
-      <button onClick={onRestart} className="clay-btn" style={{ ...S.btn(C.pink), width:"100%", fontSize:16, padding:"14px 0" }}>다시 도전하기 🔄</button>
+      <button onClick={onRestart} className="clay-btn" style={{ ...S.btn(C.pink), width:"100%", fontSize:15, padding:"12px 0", borderRadius: 14 }}>다시 도전하기 🔄</button>
+    </div>
+  );
+}
+
+// ─── Main App ───
+// ─── Dice Roll Modal (Transition Effect) ───
+function DiceModal({ location, district }) {
+  const tc = calcTC(district.id, location.dist);
+  const sc = staminaCostFor(tc);
+  return (
+    <div style={{
+      position: "fixed",
+      top: 0, left: 0, right: 0, bottom: 0,
+      background: "rgba(0,0,0,0.65)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 9999,
+      backdropFilter: "blur(6px)"
+    }}>
+      <div style={{
+        backgroundImage: "url('/images/board_game_card_frame.png')",
+        backgroundSize: "100% 100%",
+        width: 320,
+        height: 320,
+        padding: "45px 35px 35px 35px",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        boxShadow: "0 16px 36px rgba(0,0,0,0.25)",
+        borderRadius: 24,
+        backgroundPosition: "center",
+        textAlign: "center"
+      }}>
+        <h2 style={{ fontSize: 16, fontWeight: 900, color: C.text, margin: "0 0 10px" }}>🎲 주사위 굴려 이동하기!</h2>
+        
+        <img 
+          src="/images/game_dice.png" 
+          alt="주사위" 
+          className="dice-animation" 
+          style={{ width: 100, height: 100, objectFit: "contain", margin: "10px 0" }} 
+        />
+        
+        <div style={{ fontSize: 13, color: C.pink, fontWeight: 900, marginTop: 10 }}>
+          {location.name}으로 출발!
+        </div>
+        <div style={{ fontSize: 11, color: C.textLight, fontWeight: 800, marginTop: 4 }}>
+          {tc === 0 ? "🚶 도보 이동 (체력 5 소모)" : `🚇 교통비 ${fmt(tc)} (체력 ${sc} 소모)`}
+        </div>
+      </div>
     </div>
   );
 }
@@ -1106,6 +1216,8 @@ export default function App() {
   const [discountLocs, setDiscountLocs] = useState([]);
   const [solvedLocs, setSolvedLocs] = useState([]);
   const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [rollingDice, setRollingDice] = useState(false);
+  const [diceDest, setDiceDest] = useState(null);
 
   const locations = difficulty ? ALL_LOCATIONS.filter(l => difficulty==="hard" || l.mode==="easy") : [];
 
@@ -1114,7 +1226,7 @@ export default function App() {
     setCart([]); setSpent(0); setTransportSpent(0); setStamina(100);
     setVisited([]); setCurLoc(null); setTBought([]); setTResisted(0);
     setCurTemp(null); setUsedT([]); setDiscountLocs([]); setSolvedLocs([]);
-    setDashboardOpen(false);
+    setDashboardOpen(false); setRollingDice(false); setDiceDest(null);
   },[]);
 
   const visitLoc = useCallback(loc=>{
@@ -1122,7 +1234,17 @@ export default function App() {
     const sc = staminaCostFor(tc);
     setSpent(s=>s+tc); setTransportSpent(ts=>ts+tc);
     if(difficulty==="hard") setStamina(st=>Math.max(0,st-sc));
-    setCurLoc(loc); setVisited(v=>[...v,loc.id]); setScreen("shopping");
+    setCurLoc(loc); setVisited(v=>[...v,loc.id]);
+    
+    // 주사위 굴리는 모달 시작
+    setDiceDest(loc);
+    setRollingDice(true);
+    playSFX("dice");
+    
+    setTimeout(() => {
+      setRollingDice(false);
+      setScreen("shopping");
+    }, 1300);
   },[district,difficulty]);
 
   const buyItem = useCallback((it,p,loc)=>{
@@ -1144,6 +1266,15 @@ export default function App() {
         @keyframes pin-bounce {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-8px); }
+        }
+        @keyframes dice-roll {
+          0% { transform: scale(0.6) rotate(0deg); filter: blur(2px); }
+          30% { transform: scale(1.1) rotate(180deg); filter: blur(0px); }
+          60% { transform: scale(0.85) rotate(360deg); filter: blur(2px); }
+          100% { transform: scale(1.0) rotate(720deg); filter: blur(0px); }
+        }
+        .dice-animation {
+          animation: dice-roll 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
         }
         .map-pin-active {
           animation: pin-bounce 0.8s infinite ease-in-out;
@@ -1249,6 +1380,7 @@ export default function App() {
           setScreen("map");
         }}/>}
         {screen==="result"&&mission&&district && <ResultScreen mission={mission} cart={cart} spent={spent} transportSpent={transportSpent} tBought={tBought} tResisted={tResisted} district={district} difficulty={difficulty} stamina={stamina} locations={locations} onRestart={reset}/>}
+        {rollingDice && diceDest && district && <DiceModal location={diceDest} district={district} />}
       </div>
       
       {/* Floating Toggle Button */}
