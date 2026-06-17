@@ -52,7 +52,7 @@ const S = {
     display: "inline-block",
     border: "1.5px solid rgba(0,0,0,0.05)"
   }),
-  container: { maxWidth: 480, margin: "0 auto", padding: "16px 16px 32px", fontFamily: "'Pretendard','Noto Sans KR',system-ui,sans-serif", color: C.text, minHeight: "100vh", background: C.bg },
+  container: { maxWidth: 800, margin: "0 auto", padding: "16px 16px 32px", fontFamily: "'Pretendard','Noto Sans KR',system-ui,sans-serif", color: C.text, minHeight: "100vh", background: C.bg },
 };
 
 const fmt = (n) => n.toLocaleString() + "원";
@@ -403,7 +403,7 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
   return (
     <div 
-      style={{ width: "100%", height: 350, overflow: "hidden", borderRadius: 24, border: `3px solid ${C.grayLight}`, background: C.mapLand, position: "relative", cursor: isDragging ? "grabbing" : "grab", boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)" }}
+      style={{ width: "100%", height: 450, overflow: "hidden", borderRadius: 24, border: `3.5px solid ${C.grayLight}`, background: C.mapLand, position: "relative", cursor: isDragging ? "grabbing" : "grab", boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)" }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -472,20 +472,45 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
             else if (loc.id === "mart_b") { cx = 250; cy = 480; }
             else if (loc.id === "mart_c") { cx = 860; cy = 100; }
 
-            const iv=visited.includes(loc.id), isSel=selPin===loc.id, r=isSel?24:18;
+            const iv=visited.includes(loc.id), isSel=selPin===loc.id;
             const tc = calcTC(district.id, loc.dist);
+
+            // Name tag dimensions
+            const nw = 96;
+            const nh = 26;
+            const nx = cx - nw/2;
+            const ny = cy - nh/2;
+            
+            // Cost tag dimensions
+            const cw = 74;
+            const ch = 18;
+            const cx_cost = cx - cw/2;
+            const cy_cost = cy + nh/2 + 4;
+
             return (
-              <g key={loc.id} onClick={()=>!iv&&onPin(loc)} className={`map-pin-hover ${isSel ? "map-pin-active" : ""}`} style={{ cursor:iv?"default":"pointer" }} opacity={iv?0.4:1}>
-                <ellipse cx={cx} cy={cy+r+4} rx={r*0.6} ry={3} fill="rgba(0,0,0,0.1)"/>
-                <circle cx={cx} cy={cy} r={r} fill={C.white} stroke={loc.color} strokeWidth={isSel?4:2} shadow="0 2px 6px rgba(0,0,0,0.2)"/>
-                <text x={cx} y={cy+1} fontSize={r*0.8} textAnchor="middle" dominantBaseline="central">{loc.emoji}</text>
+              <g key={loc.id} onClick={()=>!iv&&onPin(loc)} className={`map-pin-hover ${isSel ? "map-pin-active" : ""}`} style={{ cursor:iv?"default":"pointer" }} opacity={iv?0.45:1}>
+                {/* Shadow */}
+                <rect x={nx} y={ny + 3} width={nw} height={nh} rx={12} fill="rgba(0,0,0,0.1)"/>
                 
-                <rect x={cx-30} y={cy-r-18} width="60" height="15" rx="7.5" fill={loc.color}/>
-                <text x={cx} y={cy-r-8} fontSize="9" fill="white" fontWeight="800" textAnchor="middle">{loc.name}</text>
+                {/* Market Name Card */}
+                <rect x={nx} y={ny} width={nw} height={nh} rx={12} fill={C.white} stroke={loc.color} strokeWidth={isSel ? 4.5 : 2.5} />
+                <text x={cx} y={cy + 1} fontSize="12" fill={C.text} fontWeight="900" textAnchor="middle" dominantBaseline="central">
+                  {loc.name}
+                </text>
                 
-                <rect x={cx-25} y={cy+r+1} width="50" height="14" rx="7" fill={tc===0?C.green:C.blueDark} opacity="0.9"/>
-                <text x={cx} y={cy+r+10} fontSize="8" fill="white" fontWeight="700" textAnchor="middle">{tc===0?"🚶도보":`🚇${fmt(tc)}`}</text>
-                {iv&&<text x={cx+r-2} y={cy-r+4} fontSize="14">✅</text>}
+                {/* Cost Pill */}
+                <rect x={cx_cost} y={cy_cost} width={cw} height={ch} rx={9} fill={tc===0?C.green:C.blueDark} stroke="rgba(0,0,0,0.1)" strokeWidth="1"/>
+                <text x={cx} y={cy_cost + ch/2 + 0.5} fontSize="10" fill={C.white} fontWeight="800" textAnchor="middle" dominantBaseline="central">
+                  {tc===0?"🚶도보":`🚇${fmt(tc)}`}
+                </text>
+                
+                {/* Visited Check Badge (top right) */}
+                {iv && (
+                  <g transform={`translate(${nx + nw - 2}, ${ny + 2})`}>
+                    <circle cx="0" cy="0" r="10" fill={C.green} stroke={C.white} strokeWidth="2"/>
+                    <text x="0" y="1" fontSize="10" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">✓</text>
+                  </g>
+                )}
               </g>
             );
           })}
@@ -985,6 +1010,7 @@ export default function App() {
   const [usedT, setUsedT] = useState([]);
   const [discountLocs, setDiscountLocs] = useState([]);
   const [solvedLocs, setSolvedLocs] = useState([]);
+  const [dashboardOpen, setDashboardOpen] = useState(false);
 
   const locations = difficulty ? ALL_LOCATIONS.filter(l => difficulty==="hard" || l.mode==="easy") : [];
 
@@ -993,6 +1019,7 @@ export default function App() {
     setCart([]); setSpent(0); setTransportSpent(0); setStamina(100);
     setVisited([]); setCurLoc(null); setTBought([]); setTResisted(0);
     setCurTemp(null); setUsedT([]); setDiscountLocs([]); setSolvedLocs([]);
+    setDashboardOpen(false);
   },[]);
 
   const visitLoc = useCallback(loc=>{
@@ -1072,35 +1099,15 @@ export default function App() {
 
         @media (min-width: 1024px) {
           .game-layout {
-            display: flex !important;
-            gap: 32px !important;
-            max-width: 960px !important;
+            display: block !important;
+            max-width: 800px !important;
             margin: 0 auto !important;
             padding: 32px 16px !important;
-            align-items: flex-start !important;
           }
           .game-container-mobile {
-            flex: 1 !important;
-            max-width: 480px !important;
+            max-width: 100% !important;
             margin: 0 !important;
             padding: 0 !important;
-          }
-          .game-dashboard {
-            display: block !important;
-            flex: 1 !important;
-            max-width: 440px !important;
-            position: sticky !important;
-            top: 32px !important;
-            background: #FFFFFF;
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 8px 0px #ECEFF1, 0 8px 24px rgba(0,0,0,0.04);
-            border: 3.5px solid #ECEFF1;
-          }
-        }
-        @media (max-width: 1023px) {
-          .game-dashboard {
-            display: none !important;
           }
         }
       `}</style>
@@ -1149,44 +1156,127 @@ export default function App() {
         {screen==="result"&&mission&&district && <ResultScreen mission={mission} cart={cart} spent={spent} transportSpent={transportSpent} tBought={tBought} tResisted={tResisted} district={district} difficulty={difficulty} stamina={stamina} locations={locations} onRestart={reset}/>}
       </div>
       
-      {/* PC/Tablet Dashboard View */}
-      {mission && (
-        <div className="game-dashboard">
-          <h2 style={{ fontSize: 18, fontWeight: 900, color: C.pink, margin: "0 0 16px" }}>📋 심부름 대시보드</h2>
-          <div style={{ background: C.bg, borderRadius: 12, padding: 14, marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6 }}>📍 목표 동네</div>
-            <div style={{ fontSize: 15, fontWeight: 900 }}>{district ? district.name : "미선택"} ({difficulty === "hard" ? "어려움 모드" : "쉬움 모드"})</div>
-          </div>
-          <div style={{ background: C.bg, borderRadius: 12, padding: 14, marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8 }}>🛒 장보기 목록 ({cart.length}개 획득)</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {mission.required.map((r, i) => {
-                const acquired = cart.some(c => c.name === r.name);
-                return (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: "bold" }}>
-                    <span>{r.emoji} {r.name} (필수)</span>
-                    <span style={{ color: acquired ? C.green : C.red }}>{acquired ? "획득!" : "미구매"}</span>
-                  </div>
-                );
-              })}
-              {mission.optional.map((o, i) => {
-                const acquired = cart.some(c => c.name === o.name);
-                return (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: "bold" }}>
-                    <span>{o.emoji} {o.name} (선택)</span>
-                    <span style={{ color: acquired ? C.orange : C.gray }}>{acquired ? "획득!" : "미구매"}</span>
-                  </div>
-                );
-              })}
+      {/* Floating Toggle Button */}
+      {showBar && (
+        <button 
+          onClick={() => setDashboardOpen(true)}
+          className="clay-btn" 
+          style={{ 
+            position: "fixed", 
+            bottom: 24, 
+            right: 24, 
+            zIndex: 150, 
+            background: C.pink, 
+            color: C.white, 
+            borderRadius: "50%", 
+            width: 56, 
+            height: 56, 
+            fontSize: 24, 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            border: "3.5px solid rgba(0,0,0,0.15)",
+            boxShadow: "0 6px 0px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1)",
+            cursor: "pointer"
+          }}
+          title="장보기 대시보드"
+        >
+          📋
+        </button>
+      )}
+
+      {/* Toggleable Modal Dashboard */}
+      {dashboardOpen && mission && (
+        <div 
+          style={{ 
+            position: "fixed", 
+            inset: 0, 
+            background: "rgba(0,0,0,0.4)", 
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "center", 
+            zIndex: 500, 
+            padding: 16 
+          }}
+          onClick={() => setDashboardOpen(false)}
+        >
+          <div 
+            style={{ 
+              ...S.card, 
+              maxWidth: 440, 
+              width: "100%", 
+              padding: 24, 
+              maxHeight: "85vh", 
+              overflowY: "auto", 
+              position: "relative" 
+            }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 900, color: C.pink, margin: 0 }}>📋 심부름 대시보드</h2>
+              <button 
+                onClick={() => setDashboardOpen(false)} 
+                className="clay-btn"
+                style={{ 
+                  background: C.grayLight, 
+                  border: "2px solid rgba(0,0,0,0.1)", 
+                  borderRadius: "50%", 
+                  width: 32, 
+                  height: 32, 
+                  display: "flex", 
+                  alignItems: "center", 
+                  justifyContent: "center", 
+                  cursor: "pointer",
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  color: C.text
+                }}
+              >
+                ✕
+              </button>
             </div>
-          </div>
-          <div style={{ background: C.bg, borderRadius: 12, padding: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6 }}>💡 합리적 장보기 꿀팁</div>
-            <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: C.textLight, fontWeight: "bold" }}>
-              1. 전통시장은 채소와 먹거리가 대형마트보다 훨씬 저렴해요!<br/>
-              2. 너무 멀리 있는 시장으로 가면 교통비 때문에 오히려 손해를 볼 수 있어요.<br/>
-              3. 가던 도중 군것질(유혹)을 하면 예산이 부족할 수 있으니 주의해요!
-            </p>
+
+            {/* Target District */}
+            <div style={{ background: C.bg, borderRadius: 16, padding: 14, marginBottom: 16, border: `3.5px solid ${C.grayLight}`, boxShadow: "0 4px 0px #ECEFF1" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6, color: C.textLight }}>📍 목표 동네</div>
+              <div style={{ fontSize: 15, fontWeight: 900 }}>{district ? district.name : "미선택"} ({difficulty === "hard" ? "어려움 모드" : "쉬움 모드"})</div>
+            </div>
+
+            {/* Shopping List */}
+            <div style={{ background: C.bg, borderRadius: 16, padding: 14, marginBottom: 16, border: `3.5px solid ${C.grayLight}`, boxShadow: "0 4px 0px #ECEFF1" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8, color: C.textLight }}>🛒 장보기 목록 ({cart.length}개 획득)</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {mission.required.map((r, i) => {
+                  const acquired = cart.some(c => c.name === r.name);
+                  return (
+                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: "bold" }}>
+                      <span>{r.emoji} {r.name} (필수)</span>
+                      <span style={{ color: acquired ? C.green : C.red }}>{acquired ? "획득!" : "미구매"}</span>
+                    </div>
+                  );
+                })}
+                {mission.optional.map((o, i) => {
+                  const acquired = cart.some(c => c.name === o.name);
+                  return (
+                    <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: "bold" }}>
+                      <span>{o.emoji} {o.name} (선택)</span>
+                      <span style={{ color: acquired ? C.orange : C.gray }}>{acquired ? "획득!" : "미구매"}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Tips */}
+            <div style={{ background: C.bg, borderRadius: 16, padding: 14, border: `3.5px solid ${C.grayLight}`, boxShadow: "0 4px 0px #ECEFF1" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6, color: C.textLight }}>💡 합리적 장보기 꿀팁</div>
+              <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: C.textLight, fontWeight: "bold" }}>
+                1. 전통시장은 채소와 먹거리가 대형마트보다 훨씬 저렴해요!<br/>
+                2. 너무 멀리 있는 시장으로 가면 교통비 때문에 오히려 손해를 볼 수 있어요.<br/>
+                3. 가던 도중 군것질(유혹)을 하면 예산이 부족할 수 있으니 주의해요!
+              </p>
+            </div>
           </div>
         </div>
       )}
