@@ -105,19 +105,6 @@ function playSFX(type) {
       gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
       osc.start(now);
       osc.stop(now + 0.45);
-    } else if (type === "dice") {
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(300, now);
-      osc.frequency.setValueAtTime(450, now + 0.05);
-      osc.frequency.setValueAtTime(250, now + 0.1);
-      osc.frequency.setValueAtTime(500, now + 0.15);
-      osc.frequency.setValueAtTime(200, now + 0.2);
-      osc.frequency.setValueAtTime(600, now + 0.25);
-      osc.frequency.setValueAtTime(350, now + 0.35);
-      gain.gain.setValueAtTime(0.08, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.55);
-      osc.start(now);
-      osc.stop(now + 0.55);
     }
   } catch (e) {
     console.error("Audio error", e);
@@ -1147,56 +1134,6 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
 }
 
 // ─── Main App ───
-// ─── Dice Roll Modal (Transition Effect) ───
-function DiceModal({ location, district }) {
-  const tc = calcTC(district.id, location.dist);
-  const sc = staminaCostFor(tc);
-  return (
-    <div style={{
-      position: "fixed",
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.65)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 9999,
-      backdropFilter: "blur(6px)"
-    }}>
-      <div style={{
-        backgroundImage: "url('/images/board_game_card_frame.png')",
-        backgroundSize: "100% 100%",
-        width: 320,
-        height: 320,
-        padding: "45px 35px 35px 35px",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        boxShadow: "0 16px 36px rgba(0,0,0,0.25)",
-        borderRadius: 24,
-        backgroundPosition: "center",
-        textAlign: "center"
-      }}>
-        <h2 style={{ fontSize: 16, fontWeight: 900, color: C.text, margin: "0 0 10px" }}>🎲 주사위 굴려 이동하기!</h2>
-        
-        <img 
-          src="/images/game_dice.png" 
-          alt="주사위" 
-          className="dice-animation" 
-          style={{ width: 100, height: 100, objectFit: "contain", margin: "10px 0" }} 
-        />
-        
-        <div style={{ fontSize: 13, color: C.pink, fontWeight: 900, marginTop: 10 }}>
-          {location.name}으로 출발!
-        </div>
-        <div style={{ fontSize: 11, color: C.textLight, fontWeight: 800, marginTop: 4 }}>
-          {tc === 0 ? "🚶 도보 이동 (체력 5 소모)" : `🚇 교통비 ${fmt(tc)} (체력 ${sc} 소모)`}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Main App ───
 export default function App() {
   const [screen, setScreen] = useState("intro");
@@ -1216,8 +1153,6 @@ export default function App() {
   const [discountLocs, setDiscountLocs] = useState([]);
   const [solvedLocs, setSolvedLocs] = useState([]);
   const [dashboardOpen, setDashboardOpen] = useState(false);
-  const [rollingDice, setRollingDice] = useState(false);
-  const [diceDest, setDiceDest] = useState(null);
 
   const locations = difficulty ? ALL_LOCATIONS.filter(l => difficulty==="hard" || l.mode==="easy") : [];
 
@@ -1226,7 +1161,7 @@ export default function App() {
     setCart([]); setSpent(0); setTransportSpent(0); setStamina(100);
     setVisited([]); setCurLoc(null); setTBought([]); setTResisted(0);
     setCurTemp(null); setUsedT([]); setDiscountLocs([]); setSolvedLocs([]);
-    setDashboardOpen(false); setRollingDice(false); setDiceDest(null);
+    setDashboardOpen(false);
   },[]);
 
   const visitLoc = useCallback(loc=>{
@@ -1234,17 +1169,7 @@ export default function App() {
     const sc = staminaCostFor(tc);
     setSpent(s=>s+tc); setTransportSpent(ts=>ts+tc);
     if(difficulty==="hard") setStamina(st=>Math.max(0,st-sc));
-    setCurLoc(loc); setVisited(v=>[...v,loc.id]);
-    
-    // 주사위 굴리는 모달 시작
-    setDiceDest(loc);
-    setRollingDice(true);
-    playSFX("dice");
-    
-    setTimeout(() => {
-      setRollingDice(false);
-      setScreen("shopping");
-    }, 1300);
+    setCurLoc(loc); setVisited(v=>[...v,loc.id]); setScreen("shopping");
   },[district,difficulty]);
 
   const buyItem = useCallback((it,p,loc)=>{
@@ -1266,15 +1191,6 @@ export default function App() {
         @keyframes pin-bounce {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-8px); }
-        }
-        @keyframes dice-roll {
-          0% { transform: scale(0.6) rotate(0deg); filter: blur(2px); }
-          30% { transform: scale(1.1) rotate(180deg); filter: blur(0px); }
-          60% { transform: scale(0.85) rotate(360deg); filter: blur(2px); }
-          100% { transform: scale(1.0) rotate(720deg); filter: blur(0px); }
-        }
-        .dice-animation {
-          animation: dice-roll 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
         }
         .map-pin-active {
           animation: pin-bounce 0.8s infinite ease-in-out;
@@ -1380,7 +1296,6 @@ export default function App() {
           setScreen("map");
         }}/>}
         {screen==="result"&&mission&&district && <ResultScreen mission={mission} cart={cart} spent={spent} transportSpent={transportSpent} tBought={tBought} tResisted={tResisted} district={district} difficulty={difficulty} stamina={stamina} locations={locations} onRestart={reset}/>}
-        {rollingDice && diceDest && district && <DiceModal location={diceDest} district={district} />}
       </div>
       
       {/* Floating Toggle Button */}
