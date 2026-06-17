@@ -18,9 +18,40 @@ const C = {
 };
 
 const S = {
-  card: { background: C.white, borderRadius: 16, padding: 20, boxShadow: "0 2px 12px rgba(0,0,0,0.08)", border: `1px solid ${C.grayLight}` },
-  btn: (c, tc = C.white) => ({ background: c, color: tc, border: "none", borderRadius: 12, padding: "12px 24px", fontSize: 16, fontWeight: 700, cursor: "pointer", transition: "all 0.2s", display: "inline-flex", alignItems: "center", gap: 8, justifyContent: "center" }),
-  tag: (bg, c) => ({ background: bg, color: c, borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 600, display: "inline-block" }),
+  card: { 
+    background: C.white, 
+    borderRadius: 20, 
+    padding: 20, 
+    boxShadow: "0 8px 0px #ECEFF1, 0 8px 24px rgba(0,0,0,0.04)", 
+    border: `3.5px solid ${C.grayLight}`, 
+    transition: "transform 0.2s ease, box-shadow 0.2s ease" 
+  },
+  btn: (c, tc = C.white) => ({ 
+    background: c, 
+    color: tc, 
+    border: "3px solid rgba(0, 0, 0, 0.15)", 
+    borderRadius: 16, 
+    padding: "12px 24px", 
+    fontSize: 16, 
+    fontWeight: 900, 
+    cursor: "pointer", 
+    transition: "transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s ease", 
+    display: "inline-flex", 
+    alignItems: "center", 
+    gap: 8, 
+    justifyContent: "center", 
+    boxShadow: "0 6px 0px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.08)" 
+  }),
+  tag: (bg, c) => ({ 
+    background: bg, 
+    color: c, 
+    borderRadius: 20, 
+    padding: "4px 12px", 
+    fontSize: 12, 
+    fontWeight: 800, 
+    display: "inline-block",
+    border: "1.5px solid rgba(0,0,0,0.05)"
+  }),
   container: { maxWidth: 480, margin: "0 auto", padding: "16px 16px 32px", fontFamily: "'Pretendard','Noto Sans KR',system-ui,sans-serif", color: C.text, minHeight: "100vh", background: C.bg },
 };
 
@@ -172,12 +203,7 @@ const AREA_ORDER = ["도심","동북","서북","서남","동남"];
 const AREA_CLR = { "도심":C.pink, "동북":C.orange, "서북":C.green, "서남":C.purple, "동남":C.blueDark };
 const DIFF = { easy:{ maxVisits:2, stamina:false, label:"쉬움" }, hard:{ maxVisits:3, stamina:true, startStamina:100, label:"어려움" }};
 
-const MOM_IMG = {
-  normal: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAAEsCAYAAAD93j5yAAAKw0lEQVR4nO3dvY5kRxmA4RrkHBGRkQASREgQONoUZMkr4cR34MASCZIvwxIJkgPfgRMs2dIKpxs5wBIRlsCJMyLkKxiC3d7p6emf81Pn1PdVPU8CLLszZ7+qt+t0T+9MKQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXHXX+gJY54+//dn92o/x+Tff2wdJWbgEakS6lLhjszgBtQz2FkHHYjECiBzsLYJuy/AbyRztJWLen4HvrMdwTwl5Pwa9gxGivUTM2zLcDY0c7ikhb8NQNyDcy4Rcl2FWJNzphFzHj1pfQC/EO4951eFRcCUbcT2n8XIGt5Bw6xPyfG6hFxDvNsx1PgHPZJNty3znccsykY21P7fUtzmBJxBvG+Z+m4BvsInaMv/rBHyFzRODdbhMwBfYNLFYj/MEfIbNEpN1eUrAJ2yS2KzPYwI+YnPkYJ0eCPg1myIX6/WKgIvNkJV1E7BNkNzo6zd0wKMvfi9GXsdhAx550Xs06noOGfCoi927Edd1yIChF8MFPOKj9EhGW9+hAh5tcUc10joPE/BIi8o46z1EwKMsJo+NsO5DBAy96j7gER6Fuaz39e864N4Xj2l63gddBwy96zbgnh91ma/X/dBlwL0uFuv0uC+6DBhG0V3APT7KUk9v+6O7gGEkAobEugq4t9sjttHTPukqYBhNNwH39KjK9nrZL90EDCN6q/UFcN7fPvu0lFLKe+9/EOI6Sml/LTzVxU9A7+V26DiWS/aIKMp17OHzb75P3UDqiz/IHvCUYM6pFdHSz1/zGloRcABZA14TzjlzYmr5uSMRcADZAq4dzzmnQe3xOc993ugEHECmgPcKqaVMEQu4sSzxjhDuqSwhZ47Y14F3MGK8pYz7996TgDc2+iYe/e+/NW/k2IiN+yDKm1J65ATegHjPM5f6Ugcc8QUsm/S6iPOJuI+mSh1wNBE3Z0TmVI+AK7Ep5zGvOgRcgc24jLmtJ+CVbMJ1zG8dAa9g89VhjsulDbj1K4c2XV2t59l6Py2VNmBAwIu0Pi16Za7zCXgmm2xb5juPgGewufZhztMJGBIT8EROhX2Z9zQCnsBmasPcb0sZcNav2RFbxn2VMuA9OQXaMv/rfEeO185tFN9BIg7rc17K78ZX81bHI3x+NUPO9h0qh76FFm8fRl7HYQMeedF7NOp6DhnwqIvduxHXdciAoRfDBTzio/RIRlvf4QKGngwV8GiPzqMaaZ2HChh6451Yrfz89+d//buv9r2OJTJfe2dSvevkYMk7scLcVl3a/KcixpDs2pe8Q8s7sbhsagBzf+8eMl97xwS8lyWbOkoIma+9c54D7+HKZn72u18/+t8v//Gvp3+25S1p5msfgIAbOd38p7/+JIZAMl97b9xCN3Du5Drd9JciaS3ztfdIwFu78VzwePNfPLlaPZ/MfO2DEPDOjk+nc5v++Ne",
-  happy: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAPAAAAEsCAYAAAD93j5yAAAK70lEQVR4nO3dvY5kRxmA4TPIOSIiI8FIECFBQLQpliWvhBPfgQMkEiRfhiUSJAfcAQkr2dIKpxs5YCUiLIGTzYiQr2AIdnunt6d/zk/Vqe+rep7E9np2pqaq3q7TP9MzTQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXHXXegBs87tf/eR+6+d49vKVfZCUhUugRKRriTs2ixNQy2BvEXQsFiOAyMHeIui2TH4jmaO9RMz7M+E76zHcU0Lej4newQjRXiLmukxuRSOHe0rIdZjUCoR7mZDLMpkFCXc+IZfxg9YD6IV4lzFfZbgV3MhG3M5pvJ6JW0m45Ql5OZfQK4i3DvO6nIAXssnqMr/LuGSZycban0vq25zAM4i3DfN+m4BvsInaMv/XCfgKmycG63CZgC+waWKxHucJ+AybJSbr8piAT9gksVmfdwn4iM2Rg3V6IOA3bIpcrNdrAp5shqysm4BtguRGX7+hAx598Xsx8joOG/DIi96jUddzyIBHXezejbiuQwYMvRgu4BFvpUcy2voOFfBoizuqkdZ5mIBHWlTGWe8hAh5lMXnXCOs+RMDQq+4DHuFWmMt6X/+uA+598Zin533QdcDQu24D7vlWl+V63Q9dBtzrYrFNj/uiy4BhFN0F3OOtLOX0tj+6CxhGImBIrKuAe7s8oo6e9klXAcNougm4p1tV6utlv3QTMIzovdYD4Ly//fUv0zRN08effBpiHNPUfiw81sVvQO/lcug4lkv2iCjKOPbw7OWr1A2kHvxB9oDnBHNOqYjWfv2SY2hFwAFkDXhLOOcsianl145EwAFkC7h0POecBrXH1zz3daMTcACZAt4rpJYyRSzgxrLEO0K4p7KEnDlizwPvYMR4p2nc73tPAq5s9E08+vdfmxdyVGLjPojyopQeOYErEO955qW81AFHfADLJr0u4vxE3EdzpQ44moibMyLzVI6AC7EplzFfZQi4AJtxHfO2nYA3sgm3MX/bCHgDm68M87he2oBbP3Jo05XVej5b76e10gYMCHiV1qdFr8zrcgJeyCary/wuI+AFbK59mOf5BAyJCXgmp8K+zPc8Ap7BZmrDvN+WMuCsz9kRW8Z9lTLgPTkF2jL/13lHjjfObRTvIBGH9Tkv5bvxlbzUcQufX8mQs71D5dCX0OLtw8jrOGzAIy96j0ZdzyEDHnWxezfiug4ZMPRiuIBHvJUeyWjrO1zA0JOhAh7t1nlUI63zUAFDb7wSq5Wf/vb8n3/39b7jWCPz2DuT6lUnB2teiRXmsurS5j8VMYZkY1/zCi2vxOKyuQEs/dg9ZB57xwS8lzWbOkoImcfeOfeB93BlMz/59S/e+e8X//jX47/b8pI089gHIOBGTjf/6Z8/iiGQzGPvjUvoBs6dXKeb/lIkrWUee48EXNuN+4LHm//iydXq/mTmsQ9CwDs7Pp3ObfrjP4t2kmUee68EDIkNE3DE9086d0plObmijz3ietcwTMBRHW/6SAHMkXnsvfA0Um3ffX3zgZybm7/Vc6mZxz6IlCfw2terRrisWvIcabTnU7OMfe06Z3sd9DQlDRh4bbiAm5zCJ5eRc06ntx/T+hI02dgjXGXtyX3gvZzcnzxs8quvJ24d70HmsXcu3TX/wdbfztDs54OT/UztO4KPfevpm/E+cLoBH5T49SpNf8g/87taBBx7iUtnAe+o1O9HCvNOHaxW6n5vxoCHvw/88Sefbov42++v//+f/3D95+5FxTka7UGrU2kfhW5+a/nt97c35pKP61GiOWq+n1Ya/gRebO1GO/y9EU5kc7SbtCdwEyVOid5PY3O0KwHPVXJT9bpBzdHuBDxHjc3U2wY1R00IePJIZlbWLXnAuzxyWPMU6OWEST5HWR+BnqbkAcPoBAyJCRgSE/AbHhDJxXq9lj7g6g9A1HxVUC+vOEo8R5kfwJqmDgKGkQl4jhqnQC+n74E5aqKLgEtdBl29X1VyM/W6MXeao5F//vdUFwHvpsQG7TXeA3O0Kz9OuNRhcy19hdBIm9Ic7Sb9JcSxJm+z4x05bis4Ry6f3+UE3kqgt5mjatwHhsS6uIw4lv3dKr/57Iu3//6bz3/fZAznRBiXy+fHnMDBHMdxHE1LEeLlvO4C3uU5YXbn9D2vu4B7EOkUdvrG1mXAvZ3CrSJufeNx4PS9rMuAe3B62n3z2Re7BXXuazl9Y+o24B5O4XPR1I743OdvGa/T9zov5AjuEM9xWKXvl166UXDqxtflrdKx7M8LH7t1+i4JruTnqsXpe1u339ix9L9L+ETNy+gI4R6M+jt/l+j6mzu2JeJI8R4rGXKkcI9tibj3eKdpoICnaV3Ez16+urv/z9+LXIbXtiToqMGeunv/g7u161ZjPNEM8U0eW7IZDpsgS8A9unv/g7tpWrduI+j2aaRL5i7u8ccdNhH7Op73Nes2gqG+2VPnbtWvbQAn8X6u3WguXbeeDflNbyHi+lzxzDfcJfRWNldd5ncZAa9gk9VhXpcT8Eo2W1nmqmPC",
-  proud: "data:image/png;base64,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",
-  worried: "data:image/png;base64,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"
-};
+const MOM_IMG = "/images/mother_character_1781675642725.png";
 
 const MOM_BRIEFING = {
   1: "오늘 저녁에 김치찌개를 끓일 거야.\n여기 돈이니까 재료 좀 사다 줄래?\n잘 골라서 사오렴~",
@@ -187,13 +213,22 @@ const MOM_BRIEFING = {
 
 // ─── Mom Bubble Component ───
 function MomBubble({ expression, text, size }) {
-  const sz = size || 100;
+  const sz = size || 85;
+  const moodText = expression === "proud" ? "엄마 (자랑스러움! 🌟)" 
+                 : expression === "happy" ? "엄마 (기쁨! 😄)" 
+                 : expression === "worried" ? "엄마 (걱정... 😟)" 
+                 : "엄마 (기본 🙂)";
   return (
-    <div style={{ display:"flex", alignItems:"flex-start", gap:12 }}>
-      <img src={MOM_IMG[expression]} alt="엄마" style={{ width:sz, height:sz*1.25, objectFit:"contain", flexShrink:0 }} />
-      <div style={{ position:"relative", background:C.white, borderRadius:16, padding:"12px 16px", boxShadow:"0 2px 8px rgba(0,0,0,0.08)", border:`1px solid ${C.grayLight}`, flex:1 }}>
-        <div style={{ position:"absolute", left:-8, top:20, width:0, height:0, borderTop:"8px solid transparent", borderBottom:"8px solid transparent", borderRight:`8px solid ${C.grayLight}` }} />
-        <div style={{ fontSize:14, lineHeight:1.7, whiteSpace:"pre-line", color:C.text }}>{text}</div>
+    <div style={{ background: C.white, borderRadius: 20, padding: "16px 20px", boxShadow: "0 8px 0px #ECEFF1, 0 8px 24px rgba(0,0,0,0.06)", border: `3.5px solid ${C.grayLight}`, display: "flex", gap: 16, alignItems: "center" }}>
+      <div style={{ position: "relative", width: sz, height: sz * 1.1, flexShrink: 0 }}>
+        <img src={MOM_IMG} alt="엄마" style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: 12 }} />
+        <span style={{ position: "absolute", bottom: -4, right: -4, background: C.pink, color: C.white, borderRadius: "50%", width: 24, height: 24, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, boxShadow: "0 2px 6px rgba(0,0,0,0.2)", fontWeight: "bold" }}>
+          {expression === "proud" ? "🌟" : expression === "happy" ? "😄" : expression === "worried" ? "😟" : "🙂"}
+        </span>
+      </div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 13, fontWeight: 900, color: C.pink, marginBottom: 4 }}>{moodText}</div>
+        <div style={{ fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-line", color: C.text, fontWeight: 600 }}>{text}</div>
       </div>
     </div>
   );
@@ -204,22 +239,22 @@ function TopBar({ budget, spent, transportTotal, difficulty, stamina }) {
   const rem = budget - spent;
   const pct = Math.max(0,(rem/budget)*100);
   return (
-    <div style={{ background:C.white, borderRadius:14, padding:"10px 14px", marginBottom:14, boxShadow:"0 2px 8px rgba(0,0,0,0.06)" }}>
+    <div style={{ background: C.white, borderRadius: 20, padding: "12px 16px", marginBottom: 14, boxShadow: "0 8px 0px #ECEFF1, 0 8px 20px rgba(0,0,0,0.04)", border: `3.5px solid ${C.grayLight}` }}>
       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:6 }}>
-        <span style={{ fontSize:13, color:C.textLight }}>💰 남은 예산</span>
-        <span style={{ fontSize:14, fontWeight:700, color:rem<budget*0.2?C.red:C.green }}>{fmt(rem)}</span>
+        <span style={{ fontSize:13, color:C.textLight, fontWeight: 700 }}>💰 남은 예산</span>
+        <span style={{ fontSize:15, fontWeight:900, color:rem<budget*0.2?C.red:C.green }}>{fmt(rem)}</span>
       </div>
-      <div style={{ background:C.grayLight, borderRadius:8, height:10 }}>
+      <div style={{ background:C.grayLight, borderRadius:8, height:10, overflow: "hidden" }}>
         <div style={{ width:`${pct}%`, height:"100%", borderRadius:8, background:pct<20?C.red:pct<40?C.orange:C.green, transition:"width 0.4s" }} />
       </div>
-      {transportTotal > 0 && <div style={{ fontSize:11, color:C.textLight, marginTop:3, textAlign:"right" }}>🚇 교통비: {fmt(transportTotal)}</div>}
+      {transportTotal > 0 && <div style={{ fontSize:11, color:C.textLight, marginTop:4, textAlign:"right", fontWeight: 600 }}>🚇 누적 교통비: {fmt(transportTotal)}</div>}
       {difficulty === "hard" && (
         <div style={{ marginTop:8 }}>
           <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-            <span style={{ fontSize:13, color:C.textLight }}>🏃 체력</span>
-            <span style={{ fontSize:13, fontWeight:700, color:stamina<30?C.red:stamina<60?C.orange:C.stamina }}>{stamina}/100</span>
+            <span style={{ fontSize:13, color:C.textLight, fontWeight: 700 }}>🏃 남은 체력</span>
+            <span style={{ fontSize:13, fontWeight:900, color:stamina<30?C.red:stamina<60?C.orange:C.stamina }}>{stamina}/100</span>
           </div>
-          <div style={{ background:C.grayLight, borderRadius:8, height:10 }}>
+          <div style={{ background:C.grayLight, borderRadius:8, height:10, overflow: "hidden" }}>
             <div style={{ width:`${stamina}%`, height:"100%", borderRadius:8, background:stamina<30?C.red:stamina<60?C.orange:C.stamina, transition:"width 0.4s" }} />
           </div>
         </div>
@@ -231,15 +266,15 @@ function TopBar({ budget, spent, transportTotal, difficulty, stamina }) {
 // ─── Screens ───
 function IntroScreen({ onStart }) {
   return (
-    <div style={{ textAlign:"center", paddingTop:32 }}>
-      <div style={{ fontSize:64, marginBottom:4 }}>🛒</div>
-      <h1 style={{ fontSize:30, fontWeight:900, color:C.pink, margin:"0 0 4px" }}>시장에 가면</h1>
-      <p style={{ fontSize:14, color:C.textLight, margin:"0 0 28px" }}>서울의 시장 and 마트에서 합리적인 선택을 배워요!</p>
-      <div style={{ ...S.card, textAlign:"left", marginBottom:20 }}>
-        <h3 style={{ fontSize:15, fontWeight:700, margin:"0 0 10px", color:C.pink }}>🎯 학습 목표</h3>
-        <p style={{ fontSize:14, lineHeight:1.8, margin:0 }}><b>물건값</b>과 <b>교통비</b>, 그리고 나의 <b>마음</b>까지 생각해서 <b>합리적인 선택</b>이 무엇인지 알아봐요.</p>
+    <div style={{ textAlign:"center", paddingTop:20 }}>
+      <div style={{ fontSize:72, marginBottom:4, filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.1))" }}>🛒</div>
+      <h1 style={{ fontSize:32, fontWeight:900, color:C.pink, margin:"0 0 6px", letterSpacing: "-1px" }}>시장에 가면</h1>
+      <p style={{ fontSize:14, color:C.textLight, margin:"0 0 28px", fontWeight: 600 }}>서울의 전통시장과 마트에서 경제 관념을 배워요!</p>
+      <div style={{ ...S.card, textAlign:"left", marginBottom:24 }}>
+        <h3 style={{ fontSize:16, fontWeight:900, margin:"0 0 10px", color:C.pink }}>🎯 합리적 심부름 미션</h3>
+        <p style={{ fontSize:14, lineHeight:1.8, margin:0, fontWeight: 600 }}><b>물건값</b>과 <b>교통비</b>, 그리고 소비의 <b>유혹</b>까지 조절하며 엄마가 내준 미션을 성공시켜 보세요.</p>
       </div>
-      <button onClick={onStart} style={{ ...S.btn(C.pink), width:"100%", fontSize:18, padding:"16px 0" }}>게임 시작하기 🚀</button>
+      <button onClick={onStart} className="clay-btn" style={{ ...S.btn(C.pink), width:"100%", fontSize:18, padding:"16px 0" }}>심부름 시작하기 🚀</button>
     </div>
   );
 }
@@ -247,22 +282,22 @@ function IntroScreen({ onStart }) {
 function DifficultyScreen({ onSelect }) {
   return (
     <div>
-      <h2 style={{ fontSize:20, fontWeight:800, textAlign:"center", margin:"20px 0 6px" }}>⚡ 난이도 선택</h2>
-      <p style={{ textAlign:"center", fontSize:13, color:C.textLight, margin:"0 0 20px" }}>어떤 모드로 도전할까요?</p>
+      <h2 style={{ fontSize:22, fontWeight:900, textAlign:"center", margin:"20px 0 6px" }}>⚡ 난이도 선택</h2>
+      <p style={{ textAlign:"center", fontSize:14, color:C.textLight, margin:"0 0 24px", fontWeight: 600 }}>심부름의 난이도를 결정해 주세요.</p>
       <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
-        <button onClick={()=>onSelect("easy")} style={{ ...S.card, cursor:"pointer", textAlign:"left", border:`2px solid ${C.green}`, display:"block", width:"100%", padding:20 }}>
+        <button onClick={()=>onSelect("easy")} className="clay-card-hover" style={{ ...S.card, cursor:"pointer", textAlign:"left", border:`3.5px solid ${C.green}`, display:"block", width:"100%", padding:20 }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
-            <span style={{ fontSize:36 }}>😊</span>
-            <div><div style={{ fontWeight:700, fontSize:18, color:C.green }}>쉬움</div><span style={S.tag(C.greenLight,C.green)}>처음 해보는 친구</span></div>
+            <span style={{ fontSize:38 }}>😊</span>
+            <div><div style={{ fontWeight:900, fontSize:18, color:C.green }}>쉬움 모드</div><span style={S.tag(C.greenLight,C.green)}>입문용 추천</span></div>
           </div>
-          <p style={{ fontSize:13, color:C.textLight, margin:0, lineHeight:1.6 }}>시장 3곳 + 마트 1곳에서 골라요.<br/>최대 2곳 방문. 교통비를 생각하며 장보기!</p>
+          <p style={{ fontSize:13, color:C.textLight, margin:0, lineHeight:1.6, fontWeight: 600 }}>시장 3곳 + 마트 1곳에서 골라요.<br/>방문지는 최대 2곳! 체력 제약 없이 장보기에 집중해요.</p>
         </button>
-        <button onClick={()=>onSelect("hard")} style={{ ...S.card, cursor:"pointer", textAlign:"left", border:`2px solid ${C.red}`, display:"block", width:"100%", padding:20 }}>
+        <button onClick={()=>onSelect("hard")} className="clay-card-hover" style={{ ...S.card, cursor:"pointer", textAlign:"left", border:`3.5px solid ${C.red}`, display:"block", width:"100%", padding:20 }}>
           <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
-            <span style={{ fontSize:36 }}>🔥</span>
-            <div><div style={{ fontWeight:700, fontSize:18, color:C.red }}>어려움</div><span style={S.tag(C.redLight,C.red)}>자신 있는 친구</span></div>
+            <span style={{ fontSize:38 }}>🔥</span>
+            <div><div style={{ fontWeight:900, fontSize:18, color:C.red }}>어려움 모드</div><span style={S.tag(C.redLight,C.red)}>고급 도전자용</span></div>
           </div>
-          <p style={{ fontSize:13, color:C.textLight, margin:0, lineHeight:1.6 }}>시장 5곳 + 마트 3곳! 선택지가 많아요.<br/>최대 3곳 방문 + <b>🏃 체력 관리</b>까지! 멀리 가면 힘들어요.</p>
+          <p style={{ fontSize:13, color:C.textLight, margin:0, lineHeight:1.6, fontWeight: 600 }}>시장 5곳 + 마트 3곳의 넓은 서울 맵!<br/>최대 3곳 방문 가능하며, <b>🏃 체력 관리</b>도 필요해요.</p>
         </button>
       </div>
     </div>
@@ -272,15 +307,15 @@ function DifficultyScreen({ onSelect }) {
 function MissionScreen({ onSelect }) {
   return (
     <div>
-      <h2 style={{ fontSize:20, fontWeight:800, textAlign:"center", margin:"12px 0 6px" }}>📋 미션 선택</h2>
+      <h2 style={{ fontSize:22, fontWeight:900, textAlign:"center", margin:"12px 0 6px" }}>📋 미션 선택</h2>
       <div style={{ display:"flex", flexDirection:"column", gap:14 }}>
         {MISSIONS.map(m=>(
-          <button key={m.id} onClick={()=>onSelect(m)} style={{ ...S.card, cursor:"pointer", textAlign:"left", border:`2px solid ${C.grayLight}`, display:"block", width:"100%", padding:18 }}>
+          <button key={m.id} onClick={()=>onSelect(m)} className="clay-card-hover" style={{ ...S.card, cursor:"pointer", textAlign:"left", border:`3.5px solid ${C.grayLight}`, display:"block", width:"100%", padding:18 }}>
             <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
               <span style={{ fontSize:32 }}>{m.emoji}</span>
-              <div><div style={{ fontWeight:700, fontSize:17 }}>{m.title}</div><span style={S.tag(C.pinkLight,C.pink)}>예산 {fmt(m.budget)}</span></div>
+              <div><div style={{ fontWeight:900, fontSize:17 }}>{m.title}</div><span style={S.tag(C.pinkLight,C.pink)}>예산 {fmt(m.budget)}</span></div>
             </div>
-            <p style={{ fontSize:13, color:C.textLight, margin:"0 0 8px" }}>{m.desc}</p>
+            <p style={{ fontSize:13, color:C.textLight, margin:"0 0 10px", fontWeight: 600 }}>{m.desc}</p>
             <div style={{ display:"flex", flexWrap:"wrap", gap:4 }}>
               {m.required.map((it,i)=><span key={i} style={{ ...S.tag(C.grayLight,C.grayDark), fontSize:11 }}>{it.emoji} {it.name}</span>)}
             </div>
@@ -294,16 +329,16 @@ function MissionScreen({ onSelect }) {
 function DistrictScreen({ onSelect }) {
   return (
     <div>
-      <h2 style={{ fontSize:20, fontWeight:800, textAlign:"center", margin:"12px 0 4px" }}>📍 우리 동네 선택</h2>
-      <div style={{ ...S.card, padding:14, marginBottom:14, background:C.blueLight, border:`1px solid ${C.blue}` }}>
-        <p style={{ margin:0, fontSize:13, lineHeight:1.6 }}>💡 동네에 따라 <b>교통비</b>와 <b>체력 소모</b>가 달라요!</p>
+      <h2 style={{ fontSize:22, fontWeight:900, textAlign:"center", margin:"12px 0 4px" }}>📍 출발 동네 선택</h2>
+      <div style={{ ...S.card, padding:14, marginBottom:16, background:C.blueLight, border:`3.5px solid ${C.blue}` }}>
+        <p style={{ margin:0, fontSize:13, lineHeight:1.6, fontWeight: 700 }}>💡 동네에 따라 상점과의 거리(교통비, 체력 소모)가 달라집니다!</p>
       </div>
       {AREA_ORDER.map(area=>(
-        <div key={area} style={{ marginBottom:12 }}>
-          <div style={{ ...S.tag(AREA_CLR[area]+"22",AREA_CLR[area]), marginBottom:8, fontSize:13 }}>{area}</div>
+        <div key={area} style={{ marginBottom:14 }}>
+          <div style={{ ...S.tag(AREA_CLR[area]+"22",AREA_CLR[area]), marginBottom:8, fontSize:13 }}>{area} 권역</div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
             {DISTRICTS.filter(d=>d.a===area).map(d=>(
-              <button key={d.id} onClick={()=>onSelect(d)} style={{ background:C.white, border:`1.5px solid ${C.grayLight}`, borderRadius:10, padding:"8px 14px", fontSize:14, fontWeight:600, cursor:"pointer" }}>{d.name}</button>
+              <button key={d.id} onClick={()=>onSelect(d)} className="clay-btn" style={{ background:C.white, border:`2.5px solid ${C.grayLight}`, borderRadius:12, padding:"8px 14px", fontSize:14, fontWeight:900, cursor:"pointer", boxShadow: "0 3px 0px rgba(0,0,0,0.1)", color: C.text }}>{d.name}</button>
             ))}
           </div>
         </div>
@@ -316,61 +351,152 @@ function BriefingScreen({ mission, district, difficulty, onGo }) {
   return (
     <div>
       <div style={{ textAlign:"center", marginBottom:16 }}>
-        <span style={{ ...S.tag(C.pinkLight,C.pink), fontSize:12 }}>{mission.emoji} {mission.title}</span>
+        <span style={{ ...S.tag(C.pinkLight,C.pink), fontSize:13 }}>{mission.emoji} {mission.title}</span>
       </div>
-      <MomBubble expression="normal" text={MOM_BRIEFING[mission.id]} size={90} />
-      <div style={{ ...S.card, marginTop:16, padding:14 }}>
-        <div style={{ fontSize:13, fontWeight:700, marginBottom:8 }}>🛒 사올 것</div>
+      <MomBubble expression="normal" text={MOM_BRIEFING[mission.id]} size={80} />
+      <div style={{ ...S.card, marginTop:16, padding:16 }}>
+        <div style={{ fontSize:14, fontWeight:900, marginBottom:8, color: C.pink }}>🛒 사와야 할 물건 목록</div>
         <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
           {mission.required.map((r,i)=><span key={i} style={S.tag(C.pinkLight,C.pink)}>{r.emoji} {r.name}</span>)}
           {mission.optional.map((o,i)=><span key={`o${i}`} style={S.tag(C.orangeLight,C.orange)}>{o.emoji} {o.name} (선택)</span>)}
         </div>
       </div>
       <div style={{ ...S.card, marginTop:10, padding:14, display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <span style={{ fontSize:14 }}>💰 예산</span>
-        <span style={{ fontSize:18, fontWeight:800, color:C.pink }}>{fmt(mission.budget)}</span>
+        <span style={{ fontSize:14, fontWeight: 700 }}>💰 지원받은 용돈</span>
+        <span style={{ fontSize:20, fontWeight:900, color:C.pink }}>{fmt(mission.budget)}</span>
       </div>
-      <div style={{ display:"flex", gap:8, marginTop:10 }}>
-        <div style={{ ...S.tag(C.pinkLight,C.pink), fontSize:12 }}>📍 {district.name}에서 출발</div>
-        <div style={{ ...S.tag(difficulty==="hard"?C.redLight:C.greenLight, difficulty==="hard"?C.red:C.green), fontSize:12 }}>{DIFF[difficulty].label}</div>
+      <div style={{ display:"flex", gap:8, marginTop:12 }}>
+        <div style={{ ...S.tag(C.pinkLight,C.pink), fontSize:12 }}>📍 {district.name} 출발</div>
+        <div style={{ ...S.tag(difficulty==="hard"?C.redLight:C.greenLight, difficulty==="hard"?C.red:C.green), fontSize:12 }}>{DIFF[difficulty].label} 난이도</div>
       </div>
-      <button onClick={onGo} style={{ ...S.btn(C.pink), width:"100%", marginTop:20, fontSize:18, padding:"16px 0" }}>심부름 출발! 🏃</button>
+      <button onClick={onGo} className="clay-btn" style={{ ...S.btn(C.pink), width:"100%", marginTop:20, fontSize:18, padding:"16px 0" }}>심부름 출발! 🏃</button>
     </div>
   );
 }
 
 // ─── Seoul Map ───
 function SeoulMap({ locations, onPin, visited, selPin, district }) {
+  const [pan, setPan] = useState({ x: -100, y: -100 });
+  const [scale, setScale] = useState(1.1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [start, setStart] = useState({ x: 0, y: 0 });
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging) return;
+    setPan({ x: e.clientX - start.x, y: e.clientY - start.y });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleWheel = (e) => {
+    e.preventDefault();
+    const nextScale = Math.min(2.5, Math.max(0.7, scale - e.deltaY * 0.0015));
+    setScale(nextScale);
+  };
+
   return (
-    <svg viewBox="0 0 400 300" style={{ width:"100%", borderRadius:20, border:`2px solid ${C.grayLight}`, background:C.mapLand }}>
-      <polygon points="0,60 30,15 60,50 90,10 120,45 150,20 180,55 200,30 210,50" fill={C.mountain} opacity="0.4"/>
-      <polygon points="200,45 230,20 260,40 290,12 320,35 340,25 360,42 400,30 400,60 200,60" fill={C.mountain} opacity="0.35"/>
-      <text x="50" y="42" fontSize="9" fill={C.greenDark} opacity="0.6" fontWeight="600" textAnchor="middle">북한산</text>
-      <path d="M0,148 Q60,132 120,142 Q180,155 240,140 Q310,128 360,138 Q380,142 400,136" fill="none" stroke={C.river} strokeWidth="22" opacity="0.5" strokeLinecap="round"/>
-      <text x="200" y="146" fontSize="11" fill={C.blueDark} opacity="0.5" fontWeight="700" textAnchor="middle">한 강</text>
-      <ellipse cx="186" cy="112" rx="18" ry="12" fill={C.mountainDark} opacity="0.2"/>
-      <text x="186" y="116" fontSize="7" fill={C.greenDark} opacity="0.5" fontWeight="600" textAnchor="middle">남산</text>
-      <rect x="0" y="155" width="400" height="145" fill={C.mapLandSouth} opacity="0.4"/>
-      {locations.map(loc=>{
-        const cx=loc.x*4, cy=loc.y*3, iv=visited.includes(loc.id), isSel=selPin===loc.id, r=isSel?20:16;
-        const tc = calcTC(district.id, loc.dist);
-        return (
-          <g key={loc.id} onClick={()=>!iv&&onPin(loc)} className={`map-pin-hover ${isSel ? "map-pin-active" : ""}`} style={{ cursor:iv?"default":"pointer" }} opacity={iv?0.4:1}>
-            <ellipse cx={cx} cy={cy+r+4} rx={r*0.6} ry={3} fill="rgba(0,0,0,0.1)"/>
-            <circle cx={cx} cy={cy} r={r} fill={C.white} stroke={loc.color} strokeWidth={isSel?3.5:2}/>
-            <text x={cx} y={cy+1} fontSize={r*0.8} textAnchor="middle" dominantBaseline="central">{loc.emoji}</text>
-            <rect x={cx-26} y={cy-r-16} width="52" height="14" rx="7" fill={loc.color}/>
-            <text x={cx} y={cy-r-7} fontSize="8" fill="white" fontWeight="700" textAnchor="middle">{loc.name}</text>
-            <rect x={cx-22} y={cy+r+1} width="44" height="12" rx="6" fill={tc===0?C.green:C.blueDark} opacity="0.85"/>
-            <text x={cx} y={cy+r+9} fontSize="7" fill="white" fontWeight="600" textAnchor="middle">{tc===0?"🚶도보":`🚇${fmt(tc)}`}</text>
-            {iv&&<text x={cx+r-2} y={cy-r+4} fontSize="12">✅</text>}
+    <div 
+      style={{ width: "100%", height: 350, overflow: "hidden", borderRadius: 24, border: `3px solid ${C.grayLight}`, background: C.mapLand, position: "relative", cursor: isDragging ? "grabbing" : "grab", boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)" }}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+      onWheel={handleWheel}
+    >
+      <svg 
+        viewBox="0 0 1000 700" 
+        style={{ width: "100%", height: "100%", userSelect: "none" }}
+      >
+        <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`} style={{ transformOrigin: "50% 50%", transition: isDragging ? "none" : "transform 0.1s ease-out" }}>
+          {/* 서울 지도 레이아웃 (배경, 산, 강) */}
+          <rect width="1000" height="700" fill={C.mapLand} />
+          <rect y="380" width="1000" height="320" fill={C.mapLandSouth} opacity="0.4" />
+          
+          {/* 산 그래픽 (북한산 등) */}
+          <polygon points="0,120 80,30 150,100 220,20 300,90 380,40 450,110 500,60" fill={C.mountain} opacity="0.4"/>
+          <polygon points="500,100 580,40 660,90 740,20 820,80 900,30 1000,110 1000,150 500,150" fill={C.mountain} opacity="0.35"/>
+          <text x="250" y="80" fontSize="12" fill={C.greenDark} opacity="0.6" fontWeight="700" textAnchor="middle">북한산 국립공원</text>
+
+          {/* 한강 줄기 렌더링 (굵고 시원하게) */}
+          <path d="M0,350 C150,300 250,320 400,380 C550,440 680,420 800,360 C900,320 950,340 1000,330" fill="none" stroke={C.river} strokeWidth="50" opacity="0.6" strokeLinecap="round"/>
+          <text x="500" y="385" fontSize="16" fill={C.blueDark} opacity="0.6" fontWeight="800" textAnchor="middle">한 강</text>
+
+          {/* 한강 다리 데코레이션 */}
+          <line x1="280" y1="315" x2="310" y2="350" stroke={C.white} strokeWidth="6" opacity="0.8" />
+          <line x1="480" y1="390" x2="495" y2="435" stroke={C.white} strokeWidth="6" opacity="0.8" />
+          <line x1="680" y1="390" x2="710" y2="360" stroke={C.white} strokeWidth="6" opacity="0.8" />
+
+          {/* 남산 서울타워 랜드마크 */}
+          <g transform="translate(460, 240)">
+            <ellipse cx="20" cy="80" rx="25" ry="15" fill={C.mountainDark} opacity="0.3" />
+            <text x="20" y="94" fontSize="9" fill={C.greenDark} opacity="0.5" fontWeight="700" textAnchor="middle">남산</text>
+            <line x1="20" y1="80" x2="20" y2="20" stroke={C.grayDark} strokeWidth="4" />
+            <circle cx="20" cy="30" r="8" fill={C.red} />
+            <polygon points="17,20 23,20 20,5" fill={C.grayDark} />
+            <text x="20" y="48" fontSize="8" fill={C.text} fontWeight="800" textAnchor="middle">🗼 N서울타워</text>
           </g>
-        );
-      })}
-      <rect x="8" y="272" width="130" height="22" rx="8" fill="rgba(255,255,255,0.85)"/>
-      <circle cx="20" cy="283" r="4" fill="#E53935"/><text x="28" y="286" fontSize="7" fill={C.text}>전통시장</text>
-      <circle cx="72" cy="283" r="4" fill="#1565C0"/><text x="80" y="286" fontSize="7" fill={C.text}>대형마트</text>
-    </svg>
+
+          {/* 63빌딩 랜드마크 */}
+          <g transform="translate(320, 395)">
+            <rect x="0" y="0" width="22" height="45" fill={C.gold} stroke={C.white} strokeWidth="1" rx="2" />
+            <rect x="5" y="-10" width="12" height="10" fill={C.gold} rx="1" />
+            <text x="11" y="55" fontSize="8" fill={C.text} fontWeight="800" textAnchor="middle">🌇 63빌딩</text>
+          </g>
+
+          {/* 롯데월드타워 랜드마크 */}
+          <g transform="translate(820, 320)">
+            <path d="M5,70 L10,10 L15,10 L20,70 Z" fill={C.blueLight} stroke={C.blueDark} strokeWidth="1.5" />
+            <line x1="12.5" y1="10" x2="12.5" y2="0" stroke={C.blueDark} strokeWidth="1" />
+            <text x="12.5" y="82" fontSize="8" fill={C.text} fontWeight="800" textAnchor="middle">🏢 롯데월드타워</text>
+          </g>
+
+          {/* 상점 핀 렌더링 (넓어진 1000x700 캔버스 맵용 재배치 좌표) */}
+          {locations.map(loc=>{
+            let cx = loc.x * 10;
+            let cy = loc.y * 7;
+            
+            // 겹침 방지 보정 좌표
+            if (loc.id === "gwangjang") { cx = 550; cy = 210; }
+            else if (loc.id === "mangwon") { cx = 150; cy = 290; }
+            else if (loc.id === "namdaemun") { cx = 460; cy = 290; }
+            else if (loc.id === "mart_a") { cx = 660; cy = 520; }
+            else if (loc.id === "gyeongdong") { cx = 780; cy = 210; }
+            else if (loc.id === "tongin") { cx = 360; cy = 180; }
+            else if (loc.id === "mart_b") { cx = 250; cy = 480; }
+            else if (loc.id === "mart_c") { cx = 860; cy = 100; }
+
+            const iv=visited.includes(loc.id), isSel=selPin===loc.id, r=isSel?24:18;
+            const tc = calcTC(district.id, loc.dist);
+            return (
+              <g key={loc.id} onClick={()=>!iv&&onPin(loc)} className={`map-pin-hover ${isSel ? "map-pin-active" : ""}`} style={{ cursor:iv?"default":"pointer" }} opacity={iv?0.4:1}>
+                <ellipse cx={cx} cy={cy+r+4} rx={r*0.6} ry={3} fill="rgba(0,0,0,0.1)"/>
+                <circle cx={cx} cy={cy} r={r} fill={C.white} stroke={loc.color} strokeWidth={isSel?4:2} shadow="0 2px 6px rgba(0,0,0,0.2)"/>
+                <text x={cx} y={cy+1} fontSize={r*0.8} textAnchor="middle" dominantBaseline="central">{loc.emoji}</text>
+                
+                <rect x={cx-30} y={cy-r-18} width="60" height="15" rx="7.5" fill={loc.color}/>
+                <text x={cx} y={cy-r-8} fontSize="9" fill="white" fontWeight="800" textAnchor="middle">{loc.name}</text>
+                
+                <rect x={cx-25} y={cy+r+1} width="50" height="14" rx="7" fill={tc===0?C.green:C.blueDark} opacity="0.9"/>
+                <text x={cx} y={cy+r+10} fontSize="8" fill="white" fontWeight="700" textAnchor="middle">{tc===0?"🚶도보":`🚇${fmt(tc)}`}</text>
+                {iv&&<text x={cx+r-2} y={cy-r+4} fontSize="14">✅</text>}
+              </g>
+            );
+          })}
+        </g>
+      </svg>
+      {/* 지도 조작 가이드 */}
+      <div style={{ position: "absolute", bottom: 12, right: 12, background: "rgba(255,255,255,0.95)", borderRadius: 10, padding: "6px 12px", fontSize: 11, pointerEvents: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", border: `1px solid ${C.grayLight}`, display: "flex", gap: 8, fontWeight: "bold" }}>
+        <span>🖱️ 드래그로 이동</span>
+        <span>🎡 휠로 확대/축소</span>
+      </div>
+    </div>
   );
 }
 
@@ -385,10 +511,10 @@ function MapScreen({ mission, visited, cart, spent, district, difficulty, stamin
     <div>
       <div style={{ display:"flex", justifyContent:"center", alignItems:"center", gap:6, marginBottom:6, flexWrap:"wrap" }}>
         <h2 style={{ fontSize:18, fontWeight:800, margin:0 }}>🗺️ 서울 지도</h2>
-        <span style={{ ...S.tag(C.pinkLight,C.pink), fontSize:11 }}>📍{district.name}</span>
+        <span style={{ ...S.tag(C.pinkLight,C.pink), fontSize:11 }}>📍 출발: {district.name}</span>
         <span style={{ ...S.tag(difficulty==="hard"?C.redLight:C.greenLight, difficulty==="hard"?C.red:C.green), fontSize:11 }}>{cfg.label}</span>
       </div>
-      <p style={{ textAlign:"center", fontSize:13, color:C.textLight, margin:"0 0 8px" }}>
+      <p style={{ textAlign:"center", fontSize:13, color:C.textLight, margin:"0 0 8px", fontWeight: "bold" }}>
         {visited.length===0?"장보러 갈 곳을 눌러주세요!":canMore?`${cfg.maxVisits-visited.length}곳 더 갈 수 있어요!`:"방문 완료!"}
       </p>
       <SeoulMap locations={locations} onPin={l=>setSelPin(l.id===selPin?null:l.id)} visited={visited} selPin={selPin} district={district}/>
@@ -400,12 +526,12 @@ function MapScreen({ mission, visited, cart, spent, district, difficulty, stamin
         const canAfford = rem >= tc;
         const canStamina = !cfg.stamina || stamina >= sc;
         return (
-          <div style={{ ...S.card, marginTop:12, padding:16, border:`2px solid ${sel.color}` }}>
+          <div style={{ ...S.card, marginTop:12, padding:16, border:`3.5px solid ${sel.color}` }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
               <span style={{ fontSize:28 }}>{sel.emoji}</span>
               <div>
-                <div style={{ fontWeight:700, fontSize:16 }}>{sel.name}</div>
-                <div style={{ fontSize:12, color:C.textLight }}>{DISTRICTS.find(d=>d.id===sel.dist)?.name} · {sel.desc}</div>
+                <div style={{ fontWeight:900, fontSize:16 }}>{sel.name}</div>
+                <div style={{ fontSize:12, color:C.textLight, fontWeight: 700 }}>{DISTRICTS.find(d=>d.id===sel.dist)?.name} · {sel.desc}</div>
               </div>
             </div>
             <div style={{ display:"flex", gap:6, flexWrap:"wrap", marginBottom:10 }}>
@@ -413,24 +539,24 @@ function MapScreen({ mission, visited, cart, spent, district, difficulty, stamin
               <span style={S.tag(tc===0?C.greenLight:C.orangeLight, tc===0?C.green:C.orange)}>{tc===0?"🚶 도보 (0원)":`🚇 ${fmt(tc)}`}</span>
               {cfg.stamina && <span style={S.tag(sc<=15?"#FFF3E0":"#FFEBEE", sc<=15?C.orange:C.red)}>🏃 체력 -{sc}</span>}
             </div>
-            {tc>0 && <div style={{ background:C.orangeLight, borderRadius:10, padding:"6px 12px", marginBottom:8, fontSize:12 }}>⚠️ 교통비 <b>{fmt(tc)}</b> 차감 (남은 돈: {fmt(rem)}→{fmt(rem-tc)})</div>}
-            {cfg.stamina && sc>15 && <div style={{ background:C.redLight, borderRadius:10, padding:"6px 12px", marginBottom:8, fontSize:12 }}>🏃 체력 <b>-{sc}</b> (현재: {stamina}→{stamina-sc})</div>}
+            {tc>0 && <div style={{ background:C.orangeLight, borderRadius:10, padding:"6px 12px", marginBottom:8, fontSize:12, fontWeight: 700 }}>⚠️ 교통비 <b>{fmt(tc)}</b> 차감 (남은 돈: {fmt(rem)}→{fmt(rem-tc)})</div>}
+            {cfg.stamina && sc>15 && <div style={{ background:C.redLight, borderRadius:10, padding:"6px 12px", marginBottom:8, fontSize:12, fontWeight: 700 }}>🏃 체력 <b>-{sc}</b> (현재: {stamina}→{stamina-sc})</div>}
             {canAfford && canStamina
-              ? <button onClick={()=>{onVisit(sel);setSelPin(null)}} style={{ ...S.btn(sel.color), width:"100%", fontSize:15 }}>이 곳으로 출발! 🚶</button>
-              : <div style={{ textAlign:"center", color:C.red, fontWeight:600, fontSize:14 }}>{!canAfford?"💸 교통비 부족":"🏃 체력 부족 (쉬어야 해요!)"}</div>}
+              ? <button onClick={()=>{onVisit(sel);setSelPin(null)}} className="clay-btn" style={{ ...S.btn(sel.color), width:"100%", fontSize:15 }}>이 곳으로 출발! 🚶</button>
+              : <div style={{ textAlign:"center", color:C.red, fontWeight:900, fontSize:14 }}>{!canAfford?"💸 교통비 부족":"🏃 체력 부족 (쉬어야 해요!)"}</div>}
           </div>
         );
       })()}
 
       {visited.length>0 && (
         <div style={{ ...S.card, marginTop:12, padding:14 }}>
-          <div style={{ fontSize:13, fontWeight:700, marginBottom:8 }}>🛒 장바구니</div>
+          <div style={{ fontSize:13, fontWeight:800, marginBottom:8 }}>🛒 장바구니</div>
           <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
             {mission.required.map((r,i)=>{const b=cart.find(c=>c.name===r.name);return <span key={i} style={S.tag(b?C.greenLight:C.redLight, b?C.green:C.red)}>{b?"✅":"❌"} {r.name}</span>;})}
           </div>
         </div>
       )}
-      {visited.length>0 && <button onClick={onFinish} style={{ ...S.btn(hasAll?C.green:C.orange), width:"100%", marginTop:12, fontSize:15 }}>{hasAll?"장보기 완료! 🎉":"⚠️ 필수 물건 부족 (그래도 끝내기)"}</button>}
+      {visited.length>0 && <button onClick={onFinish} className="clay-btn" style={{ ...S.btn(hasAll?C.green:C.orange), width:"100%", marginTop:12, fontSize:15 }}>{hasAll?"장보기 완료! 🎉":"⚠️ 필수 물건 부족 (그래도 끝내기)"}</button>}
     </div>
   );
 }
@@ -441,10 +567,10 @@ function PriceCompare({ item, curLocId, district, locations, onClose }) {
     <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.4)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:200, padding:16 }} onClick={onClose}>
       <div style={{ ...S.card, maxWidth:400, width:"100%", padding:18, maxHeight:"80vh", overflowY:"auto" }} onClick={e=>e.stopPropagation()}>
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
-          <h3 style={{ margin:"0 0 12px", fontSize:15, fontWeight:700 }}>📊 {item.emoji} {item.name}</h3>
+          <h3 style={{ margin:"0 0 12px", fontSize:15, fontWeight:900 }}>📊 {item.emoji} {item.name} 가격 비교</h3>
           <button onClick={onClose} style={{ background:"none", border:"none", fontSize:18, cursor:"pointer", color:C.gray }}>✕</button>
         </div>
-        <div style={{ fontSize:11, color:C.textLight, marginBottom:8 }}>📍 {district.name}에서 출발 기준</div>
+        <div style={{ fontSize:11, color:C.textLight, marginBottom:8, fontWeight: 700 }}>📍 출발지({district.name}) 기준 [물건값+교통비] 비교</div>
         {locations.map(loc=>{
           const p = item.prices[loc.id], tc = calcTC(district.id, loc.dist), tot = p + tc;
           const allTot = locations.map(l=>item.prices[l.id]+calcTC(district.id,l.dist));
@@ -453,17 +579,17 @@ function PriceCompare({ item, curLocId, district, locations, onClose }) {
             <div key={loc.id} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"6px 10px", marginBottom:3, borderRadius:8, background:loc.id===curLocId?C.pinkLight:best?C.greenLight:C.grayLight, fontSize:12 }}>
               <div style={{ display:"flex", alignItems:"center", gap:6 }}>
                 <span style={{ fontSize:14 }}>{loc.emoji}</span>
-                <span style={{ fontWeight:600, fontSize:12 }}>{loc.name}</span>
+                <span style={{ fontWeight:700, fontSize:12 }}>{loc.name}</span>
                 {loc.id===curLocId && <span style={{ ...S.tag(C.pink,C.white), fontSize:9 }}>현재</span>}
               </div>
               <div style={{ textAlign:"right" }}>
-                <span style={{ color:C.textLight }}>{fmt(p)}+🚇{fmt(tc)}</span>
-                <span style={{ fontWeight:700, fontSize:13, color:best?C.green:C.text, marginLeft:6 }}>={fmt(tot)}{best?" ✨":""}</span>
+                <span style={{ color:C.textLight, fontWeight: 600 }}>{fmt(p)}+🚇{fmt(tc)}</span>
+                <span style={{ fontWeight:900, fontSize:13, color:best?C.green:C.text, marginLeft:6 }}>={fmt(tot)}{best?" ✨":""}</span>
               </div>
             </div>
           );
         })}
-        <div style={{ marginTop:8, fontSize:11, color:C.blueDark, textAlign:"center", background:C.blueLight, borderRadius:8, padding:6 }}>💡 물건값 + 교통비 = 총비용으로 비교!</div>
+        <div style={{ marginTop:8, fontSize:11, color:C.blueDark, textAlign:"center", background:C.blueLight, borderRadius:8, padding:6, fontWeight: "bold" }}>💡 물건값 + 교통비 = 총비용으로 비교!</div>
       </div>
     </div>
   );
@@ -479,28 +605,37 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
   const rem = budget - spent;
   const all = [...mission.required, ...mission.optional];
 
+  const shopBg = location.type === "market" 
+    ? "/images/traditional_market_1781675804324.png"
+    : "/images/supermarket_interior_1781675823612.png";
+
   return (
     <div>
       {cmpItem && <PriceCompare item={cmpItem} curLocId={location.id} district={district} locations={locations} onClose={()=>setCmpItem(null)}/>}
       
-      <div style={{ background:`linear-gradient(135deg, ${location.color}ee, ${location.color}99)`, borderRadius:20, padding:16, color:C.white, marginBottom:14, textAlign:"center" }}>
-        <span style={{ fontSize:32 }}>{location.emoji}</span>
-        <h2 style={{ margin:"2px 0", fontSize:18, fontWeight:800 }}>{location.name}</h2>
-        <p style={{ margin:0, fontSize:12, opacity:0.9 }}>{location.spec}</p>
+      {/* RPG-style Location Graphic Card */}
+      <div style={{ position: "relative", height: 180, borderRadius: 20, overflow: "hidden", marginBottom: 14, boxShadow: "0 8px 0px #ECEFF1, 0 8px 20px rgba(0,0,0,0.15)", border: `3.5px solid ${C.grayLight}` }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: `url(${shopBg})`, backgroundSize: "cover", backgroundPosition: "center", height: "100%" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0.1))" }} />
+        <div style={{ position: "absolute", bottom: 14, left: 16, right: 16, color: C.white, textAlign: "left" }}>
+          <span style={{ fontSize: 32 }}>{location.emoji}</span>
+          <h2 style={{ margin: "2px 0 0", fontSize: 20, fontWeight: 900 }}>{location.name}</h2>
+          <p style={{ margin: 0, fontSize: 13, opacity: 0.9, fontWeight: 600 }}>{location.spec}</p>
+        </div>
       </div>
 
       {/* Bargain Quiz Banner */}
       {!isSolved ? (
-        <div style={{ ...S.card, padding: 12, marginBottom: 12, background: C.orangeLight, border: `1px dashed ${C.orange}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, fontWeight: 700 }}>💡 흥정 퀴즈를 맞춰 10% 할인을 받아보세요!</span>
-          <button onClick={() => setShowQuiz(true)} style={{ ...S.btn(C.orange), padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>퀴즈 풀기 ⚡</button>
+        <div style={{ ...S.card, padding: 12, marginBottom: 12, background: C.orangeLight, border: `3.5px dashed ${C.orange}`, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: 13, fontWeight: 800 }}>💡 흥정 퀴즈를 맞춰 10% 할인을 받아보세요!</span>
+          <button onClick={() => setShowQuiz(true)} className="clay-btn" style={{ ...S.btn(C.orange), padding: "6px 12px", fontSize: 12, cursor: "pointer" }}>퀴즈 풀기 ⚡</button>
         </div>
       ) : isDiscounted ? (
-        <div style={{ ...S.card, padding: 12, marginBottom: 12, background: C.greenLight, border: `1px solid ${C.green}`, textAlign: "center", fontSize: 13, fontWeight: 700, color: C.greenDark }}>
+        <div style={{ ...S.card, padding: 12, marginBottom: 12, background: C.greenLight, border: `3.5px solid ${C.green}`, textAlign: "center", fontSize: 13, fontWeight: 800, color: C.greenDark }}>
           🎉 흥정 성공! 모든 물건이 10% 할인된 가격으로 적용됩니다!
         </div>
       ) : (
-        <div style={{ ...S.card, padding: 12, marginBottom: 12, background: C.grayLight, border: `1px solid ${C.gray}`, textAlign: "center", fontSize: 12, color: C.textLight }}>
+        <div style={{ ...S.card, padding: 12, marginBottom: 12, background: C.grayLight, border: `3.5px solid ${C.gray}`, textAlign: "center", fontSize: 12, color: C.textLight, fontWeight: "bold" }}>
           😔 흥정 실패! 정상가로 장을 봅니다.
         </div>
       )}
@@ -509,8 +644,8 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
       {showQuiz && activeQuiz && (
         <div style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", display:"flex", alignItems:"center", justifyContent:"center", zIndex:300, padding:16 }}>
           <div style={{ ...S.card, maxWidth:380, width:"100%", padding:20 }}>
-            <h3 style={{ margin:"0 0 12px", fontSize:16, color:C.orange }}>⚡ 흥정 퀴즈!</h3>
-            <p style={{ fontSize:14, lineHeight:1.6, marginBottom:16, fontWeight:600 }}>{activeQuiz.q}</p>
+            <h3 style={{ margin:"0 0 12px", fontSize:16, color:C.orange, fontWeight: 900 }}>⚡ 흥정 퀴즈!</h3>
+            <p style={{ fontSize:14, lineHeight:1.6, marginBottom:16, fontWeight:800 }}>{activeQuiz.q}</p>
             <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
               {activeQuiz.options.map((opt, idx) => (
                 <button key={idx} onClick={() => {
@@ -524,7 +659,7 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
                   }
                   onSolveQuiz(location.id, correct);
                   setShowQuiz(false);
-                }} style={{ ...S.btn(C.grayLight, C.text), textAlign:"left", padding:"12px 16px", fontSize:13, fontWeight:600, border: `1px solid ${C.gray}` }}>
+                }} className="clay-btn" style={{ ...S.btn(C.grayLight, C.text), textAlign:"left", padding:"12px 16px", fontSize:13, fontWeight:900 }}>
                   {idx + 1}. {opt}
                 </button>
               ))}
@@ -542,12 +677,12 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
           const cheap=Math.min(...Object.values(it.prices).filter((_,j)=>locations.some(l=>l.id===Object.keys(it.prices)[j])));
           const ok=rem>=p&&!inC;
           return (
-            <div key={i} style={{ ...S.card, padding:12, border:inC?`2px solid ${C.green}`:`1px solid ${C.grayLight}`, opacity:inC?0.65:1 }}>
+            <div key={i} style={{ ...S.card, padding:12, border:inC?`3.5px solid ${C.green}`:`3.5px solid ${C.grayLight}`, opacity:inC?0.65:1 }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8, flex:1, minWidth:0 }}>
                   <span style={{ fontSize:24 }}>{it.emoji}</span>
                   <div>
-                    <div style={{ fontWeight:700, fontSize:14 }}>{it.name}</div>
+                    <div style={{ fontWeight:900, fontSize:14 }}>{it.name}</div>
                     <div style={{ display:"flex", gap:4, marginTop:3, flexWrap:"wrap" }}>
                       <span style={S.tag(isReq?C.pinkLight:C.orangeLight, isReq?C.pink:C.orange)}>{isReq?"필수":"선택"}</span>
                       {rawPrice===cheap && <span style={S.tag(C.greenLight,C.green)}>최저가</span>}
@@ -557,7 +692,7 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
                   </div>
                 </div>
                 <div style={{ textAlign:"right", flexShrink:0, marginLeft:8 }}>
-                  <div style={{ fontWeight:800, fontSize:16, color:rawPrice===cheap?C.green:C.text }}>
+                  <div style={{ fontWeight:900, fontSize:16, color:rawPrice===cheap?C.green:C.text }}>
                     {isDiscounted && <span style={{ textDecoration: "line-through", fontSize: 12, color: C.gray, marginRight: 6 }}>{fmt(rawPrice)}</span>}
                     {fmt(p)}
                   </div>
@@ -565,7 +700,7 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
                     :ok?<button onClick={()=>{
                       playSFX("coin");
                       onBuy(it,p,location);
-                    }} style={{ ...S.btn(C.pink), padding:"5px 14px", fontSize:13, marginTop:3 }}>담기</button>
+                    }} className="clay-btn" style={{ ...S.btn(C.pink), padding:"5px 14px", fontSize:13, marginTop:3 }}>담기</button>
                     :<span style={{ fontSize:11, color:C.red }}>💸</span>}
                 </div>
               </div>
@@ -573,28 +708,34 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
           );
         })}
       </div>
-      <button onClick={onDone} style={{ ...S.btn(C.grayDark), width:"100%", marginTop:14, fontSize:15 }}>이 가게 나가기 →</button>
+      <button onClick={onDone} className="clay-btn" style={{ ...S.btn(C.grayDark), width:"100%", marginTop:14, fontSize:15 }}>이 가게 나가기 →</button>
     </div>
   );
 }
 
 function TemptationScreen({ tempt, budget, spent, onBuy, onSkip }) {
   const ok=(budget-spent)>=tempt.price;
+  const temptBg = "/images/street_food_stall_1781675841701.png";
+  
   return (
-    <div style={{ textAlign:"center", paddingTop:32 }}>
-      <div style={{ background:"linear-gradient(135deg,#FFE082,#FFB74D)", borderRadius:24, padding:28, marginBottom:20 }}>
-        <div style={{ fontSize:16, fontWeight:700, color:C.red, marginBottom:8 }}>⚡ 유혹 이벤트!</div>
-        <span style={{ fontSize:56 }}>{tempt.emoji}</span>
-        <p style={{ fontSize:15, color:C.grayDark, margin:"10px 0", lineHeight:1.6 }}>{tempt.msg}</p>
-        <div style={{ fontSize:22, fontWeight:800, color:C.red }}>{fmt(tempt.price)}</div>
+    <div style={{ textAlign:"center", paddingTop:16 }}>
+      {/* RPG-style Street Temptation Graphic Card */}
+      <div style={{ position: "relative", height: 220, borderRadius: 24, overflow: "hidden", marginBottom: 16, boxShadow: "0 8px 0px #ECEFF1, 0 8px 24px rgba(0,0,0,0.15)", border: `3.5px solid ${C.grayLight}` }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: `url(${temptBg})`, backgroundSize: "cover", backgroundPosition: "center", height: "100%" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))" }} />
+        <div style={{ position: "absolute", bottom: 16, left: 16, right: 16, color: C.white }}>
+          <div style={{ fontSize:14, fontWeight:900, color:C.gold, marginBottom: 4 }}>⚡ 길거리 유혹 이벤트!</div>
+          <p style={{ fontSize:15, margin:0, fontWeight: 800, lineHeight:1.5 }}>{tempt.msg}</p>
+        </div>
       </div>
-      <div style={{ ...S.card, marginBottom:20, padding:14, background:C.blueLight, border:`1px solid ${C.blue}` }}>
-        <p style={{ margin:0, fontSize:14 }}>미션에 <b>필요 없는</b> 물건이에요. 🤔</p>
+
+      <div style={{ ...S.card, marginBottom:20, padding:14, background:C.blueLight, border:`3.5px solid ${C.blue}` }}>
+        <p style={{ margin:0, fontSize:14, fontWeight: 700 }}>미션에 <b>필요 없는</b> 물건이에요. 먹으면 체력은 회복돼요! 🤔</p>
       </div>
       <div style={{ display:"flex", gap:10 }}>
-        <button onClick={onSkip} style={{ ...S.btn(C.green), flex:1, fontSize:15 }}>✋ 안 살래요!</button>
-        {ok?<button onClick={onBuy} style={{ ...S.btn(C.red), flex:1, fontSize:15 }}>😋 살래요!</button>
-          :<button disabled style={{ ...S.btn(C.gray), flex:1, fontSize:15, opacity:0.5, cursor:"default" }}>💸 부족</button>}
+        <button onClick={onSkip} className="clay-btn" style={{ ...S.btn(C.green), flex:1, fontSize:15 }}>✋ 안 살래요!</button>
+        {ok?<button onClick={onBuy} className="clay-btn" style={{ ...S.btn(C.red), flex:1, fontSize:15 }}>😋 살래요! (+{tempt.heal} 체력)</button>
+          :<button disabled className="clay-btn" style={{ ...S.btn(C.gray), flex:1, fontSize:15, opacity:0.5, cursor:"default" }}>💸 부족</button>}
       </div>
     </div>
   );
@@ -607,7 +748,7 @@ function MomResult({ mission, cart, spent, tBought, tResisted, rational, mood })
   // Determine expression
   const expr = rational>=80&&mood>=60 ? "proud" : rational>=60 ? "happy" : rational>=40 ? "normal" : "worried";
 
-  // Generate dynamic dialogue
+  // Generate dialogue
   let dialogue = "";
   if (rational >= 80 && mood >= 60) {
     dialogue = `우와~ 우리 아이 정말 잘했다! 필요한 것만 알뜰하게 사왔네. 엄마가 자랑스러워! ${remaining > 0 ? `${fmt(remaining)}이나 남겨오다니 최고야!` : ""}`;
@@ -644,13 +785,13 @@ function SB({ label, score, max, desc, color }) {
   return (
     <div style={{ marginBottom:10 }}>
       <div style={{ display:"flex", justifyContent:"space-between", fontSize:13, marginBottom:3 }}>
-        <span style={{ fontWeight:600 }}>{label}</span>
-        <span style={{ fontWeight:700, color }}>+{score} <span style={{ color:C.gray, fontWeight:400 }}>/{max}</span></span>
+        <span style={{ fontWeight:700 }}>{label}</span>
+        <span style={{ fontWeight:800, color }}>+{score} <span style={{ color:C.gray, fontWeight:400 }}>/{max}</span></span>
       </div>
       <div style={{ background:C.grayLight, borderRadius:6, height:8 }}>
         <div style={{ width:`${Math.min(100,(score/max)*100)}%`, height:"100%", background:color, borderRadius:6, transition:"width 0.8s" }}/>
       </div>
-      <div style={{ fontSize:11, color:C.textLight, marginTop:2 }}>{desc}</div>
+      <div style={{ fontSize:11, color:C.textLight, marginTop:2, fontWeight: "bold" }}>{desc}</div>
     </div>
   );
 }
@@ -735,7 +876,7 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
   const combo = rH&&mH ? { e:"🌟",t:"완벽한 하루!",m:"합리적으로 선택하고 마음도 뿌듯해요!" }
     : rH&&!mH ? { e:"🧠",t:"심부름은 잘했는데...",m:"현명한 선택이었어요! 아쉬운 마음은 자연스러운 거예요." }
     : !rH&&mH ? { e:"😊",t:"기분은 좋은데...",m:"기분은 좋지만 예산이 걱정돼요!" }
-    : { e:"🤗",t:"다음엔 더 잘할 수 있어요!",m:"계획을 세우면 마음도 예산도 만족할 수 있어요!" };
+    : { e:"🤗",t:"다음엔 더 잘할 수 있어요!",m:"계획을 세우면 마음도 예산도 만족할 수 있어요!",bg:"green-gradient" }; // custom placeholder
 
   const finalComboBg = rH&&mH ? "linear-gradient(135deg,#FFF9C4,#DCEDC8)"
     : rH&&!mH ? "linear-gradient(135deg,#E3F2FD,#F3E5F5)"
@@ -746,31 +887,31 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
     <div>
       <MomResult mission={mission} cart={cart} spent={spent} tBought={tBought} tResisted={tResisted} rational={rational} mood={mood} />
 
-      <div style={{ textAlign:"center", padding:"24px 16px", borderRadius:24, marginBottom:16, background:finalComboBg }}>
+      <div style={{ textAlign:"center", padding:"24px 16px", borderRadius:24, marginBottom:16, background:finalComboBg, boxShadow: "0 8px 0px #ECEFF1, 0 8px 24px rgba(0,0,0,0.08)", border: `3.5px solid ${C.grayLight}` }}>
         <div style={{ fontSize:48 }}>{combo.e}</div>
         <h2 style={{ fontSize:20, fontWeight:900, margin:"4px 0", color:C.text }}>{combo.t}</h2>
-        <p style={{ fontSize:14, color:C.grayDark, margin:"8px 0 0", lineHeight:1.6 }}>{combo.m}</p>
-        <div style={{ fontSize:11, color:C.textLight, marginTop:8 }}>📍 {district.name} · {DIFF[difficulty].label}</div>
+        <p style={{ fontSize:14, color:C.grayDark, margin:"8px 0 0", lineHeight:1.6, fontWeight: "bold" }}>{combo.m}</p>
+        <div style={{ fontSize:11, color:C.textLight, marginTop:8, fontWeight: "bold" }}>📍 {district.name} · {DIFF[difficulty].label}</div>
       </div>
 
       <div style={{ display:"flex", gap:10, marginBottom:14 }}>
-        <div style={{ flex:1, background:C.white, borderRadius:16, padding:14, textAlign:"center", boxShadow:"0 2px 8px rgba(0,0,0,0.06)", border:`2px solid ${rational>=70?C.green:rational>=50?C.orange:C.red}` }}>
-          <div style={{ fontSize:12, fontWeight:700, color:C.textLight }}>🧠 합리적 선택</div>
+        <div style={{ flex:1, background:C.white, borderRadius:20, padding:14, textAlign:"center", boxShadow:"0 6px 0px #ECEFF1, 0 8px 16px rgba(0,0,0,0.04)", border:`3.5px solid ${rational>=70?C.green:rational>=50?C.orange:C.red}` }}>
+          <div style={{ fontSize:12, fontWeight:800, color:C.textLight }}>🧠 합리적 선택</div>
           <div style={{ fontSize:34, fontWeight:900, color:rational>=70?C.green:rational>=50?C.orange:C.red }}>{rational}</div>
         </div>
-        <div style={{ flex:1, background:C.white, borderRadius:16, padding:14, textAlign:"center", boxShadow:"0 2px 8px rgba(0,0,0,0.06)", border:`2px solid ${mood>=65?C.pink:mood>=45?C.orange:C.gray}` }}>
-          <div style={{ fontSize:12, fontWeight:700, color:C.textLight }}>💛 마음 만족도</div>
+        <div style={{ flex:1, background:C.white, borderRadius:20, padding:14, textAlign:"center", boxShadow:"0 6px 0px #ECEFF1, 0 8px 16px rgba(0,0,0,0.04)", border:`3.5px solid ${mood>=65?C.pink:mood>=45?C.orange:C.gray}` }}>
+          <div style={{ fontSize:12, fontWeight:800, color:C.textLight }}>💛 마음 만족도</div>
           <div style={{ fontSize:34, fontWeight:900, color:mood>=65?C.pink:mood>=45?C.orange:C.gray }}>{mood}</div>
         </div>
       </div>
 
       {potentialSavings > 0 && (
-        <div style={{ ...S.card, marginBottom: 14, border: `2px solid ${C.green}`, background: C.greenLight }}>
-          <h3 style={{ fontSize: 14, fontWeight: 700, color: C.greenDark, margin: "0 0 8px" }}>💡 장보기 복기 피드백</h3>
-          <p style={{ margin: "0 0 12px", fontSize: 13, lineHeight: 1.6, color: C.text }}>
+        <div style={{ ...S.card, marginBottom: 14, border: `3.5px solid ${C.green}`, background: C.greenLight }}>
+          <h3 style={{ fontSize: 14, fontWeight: 900, color: C.greenDark, margin: "0 0 8px" }}>💡 장보기 복기 피드백</h3>
+          <p style={{ margin: "0 0 12px", fontSize: 13, lineHeight: 1.6, color: C.text, fontWeight: 600 }}>
             계획을 최적으로 세웠다면 <b>{fmt(potentialSavings)}</b>을 더 아껴서 총 <b>{fmt(bestCost)}</b>에 해결할 수 있었어요!
           </p>
-          <div style={{ fontSize: 12, color: C.text }}>
+          <div style={{ fontSize: 12, color: C.text, fontWeight: "bold" }}>
             <b>엄마가 권장하는 최적의 코스:</b>
             <div style={{ display: "flex", gap: 6, marginTop: 8, flexWrap: "wrap" }}>
               {bestLocs.map((loc, i) => (
@@ -782,7 +923,7 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
       )}
 
       <div style={{ ...S.card, marginBottom:14 }}>
-        <h3 style={{ fontSize:14, fontWeight:700, margin:"0 0 10px" }}>🧠 합리적 선택 점수</h3>
+        <h3 style={{ fontSize:14, fontWeight:900, margin:"0 0 10px" }}>🧠 합리적 선택 점수</h3>
         <SB label="미션 완료" score={rM} max={40} desc={`필수 ${reqB.length}/${mission.required.length}개`} color={C.green}/>
         <SB label="예산 관리" score={rB} max={25} desc={`${fmt(rem)} 절약`} color={C.blue}/>
         <SB label="총비용 비교" score={rC} max={25} desc={`최적가 ${cheapN}건`} color={C.orange}/>
@@ -790,7 +931,7 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
       </div>
 
       <div style={{ ...S.card, marginBottom:14, background:"#FFF8F8" }}>
-        <h3 style={{ fontSize:14, fontWeight:700, margin:"0 0 10px" }}>💛 마음 분석</h3>
+        <h3 style={{ fontSize:14, fontWeight:900, margin:"0 0 10px" }}>💛 마음 분석</h3>
         <div style={{ display:"flex", flexDirection:"column", gap:5 }}>
           {allReq && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.greenLight, borderRadius:8 }}><span>✅ 필수 모두 구매</span><span style={{ color:C.green, fontWeight:700 }}>+15</span></div>}
           {notB.length>0 && <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, padding:"4px 8px", background:C.redLight, borderRadius:8 }}><span>😰 {notB.map(n=>n.name).join(", ")} 못 삼</span><span style={{ color:C.red, fontWeight:700 }}>-{notB.length*10}</span></div>}
@@ -802,9 +943,9 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
         </div>
       </div>
 
-      <div style={{ ...S.card, marginBottom:14, background:"linear-gradient(135deg,#FFF9C4,#FFF3E0)", border:`1px solid ${C.gold}` }}>
-        <div style={{ fontSize:14, fontWeight:700, color:C.grayDark, marginBottom:6 }}>💭 친구와 이야기해 봐요</div>
-        <div style={{ fontSize:13, lineHeight:1.8, color:C.text }}>
+      <div style={{ ...S.card, marginBottom:14, background:"linear-gradient(135deg,#FFF9C4,#FFF3E0)", border:`3.5px solid ${C.gold}`, boxShadow: "0 8px 0px #FFF3E0, 0 8px 24px rgba(0,0,0,0.04)" }}>
+        <div style={{ fontSize:14, fontWeight:900, color:C.grayDark, marginBottom:6 }}>💭 친구와 이야기해 봐요</div>
+        <div style={{ fontSize:13, lineHeight:1.8, color:C.text, fontWeight: 600 }}>
           {rH&&!mH?"\"합리적으로 잘 골랐는데 왜 아쉬운 기분이 들까요?\""
             :!rH&&mH?"\"기분은 좋은데 예산이 부족했어요. 둘 다 만족하려면?\""
             :rH&&mH?"\"어떤 점이 합리적이면서도 기분 좋게 만들었을까요?\""
@@ -813,15 +954,15 @@ function ResultScreen({ mission, cart, spent, transportSpent, tBought, tResisted
       </div>
 
       <div style={{ ...S.card, marginBottom:14 }}>
-        <h3 style={{ fontSize:14, fontWeight:700, margin:"0 0 8px" }}>🧾 영수증</h3>
+        <h3 style={{ fontSize:14, fontWeight:900, margin:"0 0 8px" }}>🧾 영수증</h3>
         {transportSpent>0 && <div style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:`1px solid ${C.grayLight}`, fontSize:12, color:C.blueDark }}><span>🚇 교통비</span><span style={{ fontWeight:600 }}>{fmt(transportSpent)}</span></div>}
         {cart.map((ci,i)=>(<div key={i} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", borderBottom:`1px solid ${C.grayLight}`, fontSize:12 }}><span>{ci.emoji} {ci.name} <span style={{ fontSize:10, color:C.textLight }}>@{ci.locationName}</span></span><span style={{ fontWeight:600 }}>{fmt(ci.pricePaid)}</span></div>))}
         {tBought.map((t,i)=>(<div key={`t${i}`} style={{ display:"flex", justifyContent:"space-between", padding:"4px 0", fontSize:12, color:C.red }}><span>{t.emoji} {t.name}</span><span style={{ fontWeight:600 }}>{fmt(t.price)}</span></div>))}
-        <div style={{ display:"flex", justifyContent:"space-between", padding:"6px 0 0", marginTop:4, borderTop:`2px solid ${C.text}`, fontWeight:800, fontSize:14 }}><span>합계</span><span>{fmt(spent)}</span></div>
-        <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:C.green, fontWeight:600, marginTop:2 }}><span>남은 돈</span><span>{fmt(rem)}</span></div>
+        <div style={{ display:"flex", justifyContent:"space-between", padding:"6px 0 0", marginTop:4, borderTop:`2.5px solid ${C.text}`, fontWeight:900, fontSize:14 }}><span>합계</span><span>{fmt(spent)}</span></div>
+        <div style={{ display:"flex", justifyContent:"space-between", fontSize:12, color:C.green, fontWeight:900, marginTop:2 }}><span>남은 돈</span><span>{fmt(rem)}</span></div>
       </div>
 
-      <button onClick={onRestart} style={{ ...S.btn(C.pink), width:"100%", fontSize:16, padding:"14px 0" }}>다시 도전하기 🔄</button>
+      <button onClick={onRestart} className="clay-btn" style={{ ...S.btn(C.pink), width:"100%", fontSize:16, padding:"14px 0" }}>다시 도전하기 🔄</button>
     </div>
   );
 }
@@ -897,6 +1038,38 @@ export default function App() {
           min-height: 100vh;
           background: #FFF8F0;
         }
+        
+        /* Claymorphism Interactive styles */
+        .clay-btn {
+          transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.2s ease !important;
+        }
+        .clay-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 0px rgba(0,0,0,0.15), 0 10px 20px rgba(0,0,0,0.1) !important;
+          filter: brightness(1.05);
+        }
+        .clay-btn:active {
+          transform: translateY(4px) !important;
+          box-shadow: 0 2px 0px rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.08) !important;
+        }
+        .clay-btn:disabled {
+          transform: none !important;
+          box-shadow: none !important;
+          filter: grayscale(1) opacity(0.6);
+          cursor: not-allowed;
+        }
+        .clay-card-hover {
+          transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+        }
+        .clay-card-hover:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 0px #ECEFF1, 0 12px 32px rgba(0,0,0,0.05) !important;
+        }
+        .clay-card-hover:active {
+          transform: translateY(2px);
+          box-shadow: 0 4px 0px #ECEFF1, 0 4px 12px rgba(0,0,0,0.04) !important;
+        }
+
         @media (min-width: 1024px) {
           .game-layout {
             display: flex !important;
@@ -919,10 +1092,10 @@ export default function App() {
             position: sticky !important;
             top: 32px !important;
             background: #FFFFFF;
-            border-radius: 16px;
+            border-radius: 20px;
             padding: 24px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            border: 1px solid #ECEFF1;
+            box-shadow: 0 8px 0px #ECEFF1, 0 8px 24px rgba(0,0,0,0.04);
+            border: 3.5px solid #ECEFF1;
           }
         }
         @media (max-width: 1023px) {
@@ -979,37 +1152,37 @@ export default function App() {
       {/* PC/Tablet Dashboard View */}
       {mission && (
         <div className="game-dashboard">
-          <h2 style={{ fontSize: 18, fontWeight: 800, color: C.pink, margin: "0 0 16px" }}>📋 심부름 대시보드</h2>
+          <h2 style={{ fontSize: 18, fontWeight: 900, color: C.pink, margin: "0 0 16px" }}>📋 심부름 대시보드</h2>
           <div style={{ background: C.bg, borderRadius: 12, padding: 14, marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>📍 목표 동네</div>
-            <div style={{ fontSize: 15, fontWeight: 800 }}>{district ? district.name : "미선택"} ({difficulty === "hard" ? "어려움 모드" : "쉬움 모드"})</div>
+            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6 }}>📍 목표 동네</div>
+            <div style={{ fontSize: 15, fontWeight: 900 }}>{district ? district.name : "미선택"} ({difficulty === "hard" ? "어려움 모드" : "쉬움 모드"})</div>
           </div>
           <div style={{ background: C.bg, borderRadius: 12, padding: 14, marginBottom: 16 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 8 }}>🛒 장보기 목록 ({cart.length}개 획득)</div>
+            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 8 }}>🛒 장보기 목록 ({cart.length}개 획득)</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {mission.required.map((r, i) => {
                 const acquired = cart.some(c => c.name === r.name);
                 return (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: "bold" }}>
                     <span>{r.emoji} {r.name} (필수)</span>
-                    <span style={{ color: acquired ? C.green : C.red, fontWeight: 700 }}>{acquired ? "획득!" : "미구매"}</span>
+                    <span style={{ color: acquired ? C.green : C.red }}>{acquired ? "획득!" : "미구매"}</span>
                   </div>
                 );
               })}
               {mission.optional.map((o, i) => {
                 const acquired = cart.some(c => c.name === o.name);
                 return (
-                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+                  <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 13, fontWeight: "bold" }}>
                     <span>{o.emoji} {o.name} (선택)</span>
-                    <span style={{ color: acquired ? C.orange : C.gray, fontWeight: 700 }}>{acquired ? "획득!" : "미구매"}</span>
+                    <span style={{ color: acquired ? C.orange : C.gray }}>{acquired ? "획득!" : "미구매"}</span>
                   </div>
                 );
               })}
             </div>
           </div>
           <div style={{ background: C.bg, borderRadius: 12, padding: 14 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6 }}>💡 합리적 장보기 꿀팁</div>
-            <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: C.textLight }}>
+            <div style={{ fontSize: 13, fontWeight: 800, marginBottom: 6 }}>💡 합리적 장보기 꿀팁</div>
+            <p style={{ margin: 0, fontSize: 12, lineHeight: 1.6, color: C.textLight, fontWeight: "bold" }}>
               1. 전통시장은 채소와 먹거리가 대형마트보다 훨씬 저렴해요!<br/>
               2. 너무 멀리 있는 시장으로 가면 교통비 때문에 오히려 손해를 볼 수 있어요.<br/>
               3. 가던 도중 군것질(유혹)을 하면 예산이 부족할 수 있으니 주의해요!
