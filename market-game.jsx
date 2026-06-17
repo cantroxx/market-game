@@ -411,66 +411,27 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
       onWheel={handleWheel}
     >
       <svg 
-        viewBox="0 0 1000 700" 
+        viewBox="0 0 1000 1000" 
         style={{ width: "100%", height: "100%", userSelect: "none" }}
       >
         <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`} style={{ transformOrigin: "50% 50%", transition: isDragging ? "none" : "transform 0.1s ease-out" }}>
-          {/* 서울 지도 레이아웃 (배경, 산, 강) */}
-          <rect width="1000" height="700" fill={C.mapLand} />
-          <rect y="380" width="1000" height="320" fill={C.mapLandSouth} opacity="0.4" />
-          
-          {/* 산 그래픽 (북한산 등) */}
-          <polygon points="0,120 80,30 150,100 220,20 300,90 380,40 450,110 500,60" fill={C.mountain} opacity="0.4"/>
-          <polygon points="500,100 580,40 660,90 740,20 820,80 900,30 1000,110 1000,150 500,150" fill={C.mountain} opacity="0.35"/>
-          <text x="250" y="80" fontSize="12" fill={C.greenDark} opacity="0.6" fontWeight="700" textAnchor="middle">북한산 국립공원</text>
+          {/* 서울 그림 지도 일러스트 배경 */}
+          <image href="/images/seoul_game_map.png" x="0" y="0" width="1000" height="1000" />
 
-          {/* 한강 줄기 렌더링 (굵고 시원하게) */}
-          <path d="M0,350 C150,300 250,320 400,380 C550,440 680,420 800,360 C900,320 950,340 1000,330" fill="none" stroke={C.river} strokeWidth="50" opacity="0.6" strokeLinecap="round"/>
-          <text x="500" y="385" fontSize="16" fill={C.blueDark} opacity="0.6" fontWeight="800" textAnchor="middle">한 강</text>
-
-          {/* 한강 다리 데코레이션 */}
-          <line x1="280" y1="315" x2="310" y2="350" stroke={C.white} strokeWidth="6" opacity="0.8" />
-          <line x1="480" y1="390" x2="495" y2="435" stroke={C.white} strokeWidth="6" opacity="0.8" />
-          <line x1="680" y1="390" x2="710" y2="360" stroke={C.white} strokeWidth="6" opacity="0.8" />
-
-          {/* 남산 서울타워 랜드마크 */}
-          <g transform="translate(460, 240)">
-            <ellipse cx="20" cy="80" rx="25" ry="15" fill={C.mountainDark} opacity="0.3" />
-            <text x="20" y="94" fontSize="9" fill={C.greenDark} opacity="0.5" fontWeight="700" textAnchor="middle">남산</text>
-            <line x1="20" y1="80" x2="20" y2="20" stroke={C.grayDark} strokeWidth="4" />
-            <circle cx="20" cy="30" r="8" fill={C.red} />
-            <polygon points="17,20 23,20 20,5" fill={C.grayDark} />
-            <text x="20" y="48" fontSize="8" fill={C.text} fontWeight="800" textAnchor="middle">🗼 N서울타워</text>
-          </g>
-
-          {/* 63빌딩 랜드마크 */}
-          <g transform="translate(320, 395)">
-            <rect x="0" y="0" width="22" height="45" fill={C.gold} stroke={C.white} strokeWidth="1" rx="2" />
-            <rect x="5" y="-10" width="12" height="10" fill={C.gold} rx="1" />
-            <text x="11" y="55" fontSize="8" fill={C.text} fontWeight="800" textAnchor="middle">🌇 63빌딩</text>
-          </g>
-
-          {/* 롯데월드타워 랜드마크 */}
-          <g transform="translate(820, 320)">
-            <path d="M5,70 L10,10 L15,10 L20,70 Z" fill={C.blueLight} stroke={C.blueDark} strokeWidth="1.5" />
-            <line x1="12.5" y1="10" x2="12.5" y2="0" stroke={C.blueDark} strokeWidth="1" />
-            <text x="12.5" y="82" fontSize="8" fill={C.text} fontWeight="800" textAnchor="middle">🏢 롯데월드타워</text>
-          </g>
-
-          {/* 상점 핀 렌더링 (넓어진 1000x700 캔버스 맵용 재배치 좌표) */}
+          {/* 상점 핀 렌더링 (그림 지도 라벨 매칭 보정 좌표) */}
           {locations.map(loc=>{
             let cx = loc.x * 10;
-            let cy = loc.y * 7;
+            let cy = loc.y * 10;
             
-            // 겹침 방지 보정 좌표
-            if (loc.id === "gwangjang") { cx = 550; cy = 210; }
-            else if (loc.id === "mangwon") { cx = 150; cy = 290; }
-            else if (loc.id === "namdaemun") { cx = 460; cy = 290; }
-            else if (loc.id === "mart_a") { cx = 660; cy = 520; }
-            else if (loc.id === "gyeongdong") { cx = 780; cy = 210; }
-            else if (loc.id === "tongin") { cx = 360; cy = 180; }
-            else if (loc.id === "mart_b") { cx = 250; cy = 480; }
-            else if (loc.id === "mart_c") { cx = 860; cy = 100; }
+            // 일러스트 지도 지명 라벨 위치 매칭 보정 좌표 (1000x1000 기준)
+            if (loc.id === "gwangjang") { cx = 680; cy = 460; }
+            else if (loc.id === "mangwon") { cx = 150; cy = 640; }
+            else if (loc.id === "namdaemun") { cx = 560; cy = 390; }
+            else if (loc.id === "mart_a") { cx = 800; cy = 790; }
+            else if (loc.id === "gyeongdong") { cx = 850; cy = 300; }
+            else if (loc.id === "tongin") { cx = 200; cy = 320; }
+            else if (loc.id === "mart_b") { cx = 320; cy = 820; }
+            else if (loc.id === "mart_c") { cx = 800; cy = 180; }
 
             const iv=visited.includes(loc.id), isSel=selPin===loc.id;
             const tc = calcTC(district.id, loc.dist);
