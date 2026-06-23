@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 
 const C = {
   bg: "#FFF8F0", pink: "#FF6B8A", pinkLight: "#FFE4EC",
@@ -436,16 +436,21 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
   const [isDragging, setIsDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
   const [hoveredPin, setHoveredPin] = useState(null);
+  const movedRef = useRef(false);
+  const pinchRef = useRef(null);
 
+  // ── Mouse handlers (desktop) ──
   const handleMouseDown = (e) => {
     setIsDragging(true);
     setStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+    movedRef.current = false;
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
     const nextX = e.clientX - start.x;
     const nextY = e.clientY - start.y;
+    if (Math.abs(nextX - pan.x) > 3 || Math.abs(nextY - pan.y) > 3) movedRef.current = true;
     setPan(clampPan(nextX, nextY, scale));
   };
 
@@ -458,6 +463,53 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
     const nextScale = Math.min(2.5, Math.max(1.0, scale - e.deltaY * 0.0015));
     setScale(nextScale);
     setPan(clampPan(pan.x, pan.y, nextScale));
+  };
+
+  // ── Touch handlers (mobile) ──
+  const getTouchDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+
+  const handleTouchStart = (e) => {
+    e.preventDefault();
+    const t = e.touches;
+    if (t.length === 1) {
+      setIsDragging(true);
+      setStart({ x: t[0].clientX - pan.x, y: t[0].clientY - pan.y });
+      movedRef.current = false;
+    } else if (t.length === 2) {
+      setIsDragging(false);
+      pinchRef.current = { dist: getTouchDist(t), scale, pan: { ...pan } };
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+    const t = e.touches;
+    if (t.length === 1 && isDragging) {
+      const nextX = t[0].clientX - start.x;
+      const nextY = t[0].clientY - start.y;
+      if (Math.abs(nextX - pan.x) > 3 || Math.abs(nextY - pan.y) > 3) movedRef.current = true;
+      setPan(clampPan(nextX, nextY, scale));
+    } else if (t.length === 2 && pinchRef.current) {
+      movedRef.current = true;
+      const newDist = getTouchDist(t);
+      const ratio = newDist / pinchRef.current.dist;
+      const nextScale = Math.min(2.5, Math.max(1.0, pinchRef.current.scale * ratio));
+      setScale(nextScale);
+      setPan(clampPan(pinchRef.current.pan.x, pinchRef.current.pan.y, nextScale));
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (e.touches.length === 0) {
+      setIsDragging(false);
+      pinchRef.current = null;
+    }
+  };
+
+  // Pin click guard: only fire if not dragged
+  const handlePinClick = (loc) => {
+    if (movedRef.current) return;
+    onPin(loc);
   };
 
   // 출발지 좌표 구하기
@@ -483,12 +535,15 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
   return (
     <div 
-      style={{ width: "100%", height: 450, overflow: "hidden", borderRadius: 24, border: `3.5px solid ${C.grayLight}`, background: C.mapLand, position: "relative", cursor: isDragging ? "grabbing" : "grab", boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)" }}
+      style={{ width: "100%", height: 450, overflow: "hidden", borderRadius: 24, border: `3.5px solid ${C.grayLight}`, background: C.mapLand, position: "relative", cursor: isDragging ? "grabbing" : "grab", boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)", touchAction: "none", userSelect: "none" }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       onWheel={handleWheel}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
     >
       <svg 
         viewBox="0 0 1000 1000" 
@@ -641,7 +696,7 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
                   height="72"
                   fill="transparent"
                   style={{ cursor: iv ? "default" : "pointer" }}
-                  onClick={() => !iv && onPin(loc)}
+                  onClick={() => !iv && handlePinClick(loc)}
                   onMouseEnter={() => !iv && setHoveredPin(loc.id)}
                   onMouseLeave={() => setHoveredPin(null)}
                 />
@@ -650,10 +705,16 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
           })}
         </g>
       </svg>
+      {/* 줌 컨트롤 버튼 */}
+      <div style={{ position: "absolute", top: 12, right: 12, display: "flex", flexDirection: "column", gap: 4, zIndex: 10 }}>
+        <button onClick={(e) => { e.stopPropagation(); const ns = Math.min(2.5, scale + 0.3); setScale(ns); setPan(clampPan(pan.x, pan.y, ns)); }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>+</button>
+        <button onClick={(e) => { e.stopPropagation(); const ns = Math.max(1.0, scale - 0.3); setScale(ns); setPan(clampPan(pan.x, pan.y, ns)); }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>−</button>
+        {scale > 1.15 && <button onClick={(e) => { e.stopPropagation(); setScale(1.1); setPan(clampPan(-100, -100, 1.1)); }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>↺</button>}
+      </div>
       {/* 지도 조작 가이드 */}
       <div style={{ position: "absolute", bottom: 12, right: 12, background: "rgba(255,255,255,0.95)", borderRadius: 10, padding: "6px 12px", fontSize: 11, pointerEvents: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", border: `1px solid ${C.grayLight}`, display: "flex", gap: 8, fontWeight: "bold" }}>
-        <span>🖱️ 드래그로 이동</span>
-        <span>🎡 휠로 확대/축소</span>
+        <span>👆 드래그로 이동</span>
+        <span>🤏 핀치/휠로 확대</span>
       </div>
     </div>
   );
