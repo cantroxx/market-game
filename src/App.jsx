@@ -229,7 +229,7 @@ const QUIZZES = [
 
 const AREA_ORDER = ["도심","동북","서북","서남","동남"];
 const AREA_CLR = { "도심":C.pink, "동북":C.orange, "서북":C.green, "서남":C.purple, "동남":C.blueDark };
-const DIFF = { easy:{ maxVisits:2, stamina:false, label:"쉬움" }, hard:{ maxVisits:3, stamina:true, startStamina:100, label:"어려움" }};
+const DIFF = { easy:{ maxVisits:4, stamina:false, label:"쉬움" }, hard:{ maxVisits:8, stamina:true, startStamina:100, label:"어려움" }};
 
 const MOM_IMG = "/images/mother_character_1781675642725.png";
 
@@ -420,9 +420,9 @@ function BriefingScreen({ mission, district, difficulty, onGo }) {
 
 // ─── Seoul Map Boundary Clamp Utility ───
 function clampPan(x, y, s) {
-  // 지도 크기 1000x1000, 뷰포트 크기 가로 800, 세로 450 기준
-  const minX = 800 - 1000 * s;
-  const minY = 450 - 1000 * s;
+  // 1000x1000 SVG ViewBox 단위 기준 경계 제한
+  const minX = 1000 - 1000 * s;
+  const minY = 1000 - 1000 * s;
   return {
     x: Math.min(0, Math.max(minX, x)),
     y: Math.min(0, Math.max(minY, y))
@@ -435,22 +435,32 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
   const [pan, setPan] = useState(() => clampPan(-100, -100, 1.1));
   const [isDragging, setIsDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
+  const [startPan, setStartPan] = useState({ x: -100, y: -100 });
   const [hoveredPin, setHoveredPin] = useState(null);
   const movedRef = useRef(false);
   const pinchRef = useRef(null);
+  const svgRef = useRef(null);
 
   // ── Mouse handlers (desktop) ──
   const handleMouseDown = (e) => {
     setIsDragging(true);
-    setStart({ x: e.clientX - pan.x, y: e.clientY - pan.y });
+    setStart({ x: e.clientX, y: e.clientY });
+    setStartPan({ ...pan });
     movedRef.current = false;
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    const nextX = e.clientX - start.x;
-    const nextY = e.clientY - start.y;
-    if (Math.abs(nextX - pan.x) > 3 || Math.abs(nextY - pan.y) > 3) movedRef.current = true;
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    const dx = e.clientX - start.x;
+    const dy = e.clientY - start.y;
+    const viewDX = dx * (1000 / rect.width);
+    const viewDY = dy * (1000 / rect.height);
+    const nextX = startPan.x + viewDX;
+    const nextY = startPan.y + viewDY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) movedRef.current = true;
     setPan(clampPan(nextX, nextY, scale));
   };
 
@@ -473,7 +483,8 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
     const t = e.touches;
     if (t.length === 1) {
       setIsDragging(true);
-      setStart({ x: t[0].clientX - pan.x, y: t[0].clientY - pan.y });
+      setStart({ x: t[0].clientX, y: t[0].clientY });
+      setStartPan({ ...pan });
       movedRef.current = false;
     } else if (t.length === 2) {
       setIsDragging(false);
@@ -485,9 +496,16 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
     e.preventDefault();
     const t = e.touches;
     if (t.length === 1 && isDragging) {
-      const nextX = t[0].clientX - start.x;
-      const nextY = t[0].clientY - start.y;
-      if (Math.abs(nextX - pan.x) > 3 || Math.abs(nextY - pan.y) > 3) movedRef.current = true;
+      const svg = svgRef.current;
+      if (!svg) return;
+      const rect = svg.getBoundingClientRect();
+      const dx = t[0].clientX - start.x;
+      const dy = t[0].clientY - start.y;
+      const viewDX = dx * (1000 / rect.width);
+      const viewDY = dy * (1000 / rect.height);
+      const nextX = startPan.x + viewDX;
+      const nextY = startPan.y + viewDY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) movedRef.current = true;
       setPan(clampPan(nextX, nextY, scale));
     } else if (t.length === 2 && pinchRef.current) {
       movedRef.current = true;
@@ -535,7 +553,21 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
   return (
     <div 
-      style={{ width: "100%", height: 450, overflow: "hidden", borderRadius: 24, border: `3.5px solid ${C.grayLight}`, background: C.mapLand, position: "relative", cursor: isDragging ? "grabbing" : "grab", boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)", touchAction: "none", userSelect: "none" }}
+      style={{ 
+        width: "100%", 
+        maxWidth: 600, 
+        margin: "0 auto", 
+        aspectRatio: "1 / 1", 
+        overflow: "hidden", 
+        borderRadius: 24, 
+        border: `3.5px solid ${C.grayLight}`, 
+        background: C.mapLand, 
+        position: "relative", 
+        cursor: isDragging ? "grabbing" : "grab", 
+        boxShadow: "inset 0 4px 12px rgba(0,0,0,0.08)", 
+        touchAction: "none", 
+        userSelect: "none" 
+      }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
@@ -546,6 +578,7 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
       onTouchEnd={handleTouchEnd}
     >
       <svg 
+        ref={svgRef}
         viewBox="0 0 1000 1000" 
         style={{ width: "100%", height: "100%", userSelect: "none" }}
       >
@@ -933,9 +966,19 @@ function ShoppingScreen({ location, mission, cart, budget, spent, district, loca
   );
 }
 
-function TemptationScreen({ tempt, budget, spent, onBuy, onSkip }) {
+function TemptationScreen({ tempt, budget, spent, difficulty, onBuy, onSkip }) {
   const ok=(budget-spent)>=tempt.price;
   const temptBg = "/images/street_food_stall_1781675841701.png";
+  
+  // 쉬움 난이도인 경우 체력 회복 관련 문구 필터링
+  let msg = tempt.msg;
+  if (difficulty === "easy") {
+    msg = msg
+      .replace(/\s*\(체력\s*\+\d+\s*회복\)/g, "")
+      .replace("귀엽지만 체력은 안 올라요.", "귀엽고 깜찍해요!")
+      .replace("달콤해서 기운이 나요! (체력 +10 회복)", "달콤해서 기분이 좋아져요!")
+      .replace("재미있지만 체력은 안 올라요.", "재미있어 보여요!");
+  }
   
   return (
     <div style={{ textAlign:"center", paddingTop:16 }}>
@@ -945,16 +988,22 @@ function TemptationScreen({ tempt, budget, spent, onBuy, onSkip }) {
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0))" }} />
         <div style={{ position: "absolute", bottom: 16, left: 16, right: 16, color: C.white }}>
           <div style={{ fontSize:14, fontWeight:900, color:C.gold, marginBottom: 4 }}>⚡ 길거리 유혹 이벤트!</div>
-          <p style={{ fontSize:15, margin:0, fontWeight: 800, lineHeight:1.5 }}>{tempt.msg}</p>
+          <p style={{ fontSize:15, margin:0, fontWeight: 800, lineHeight:1.5 }}>{msg}</p>
         </div>
       </div>
 
       <div style={{ ...S.card, marginBottom:20, padding:14, background:C.blueLight, border:`3.5px solid ${C.blue}` }}>
-        <p style={{ margin:0, fontSize:14, fontWeight: 700 }}>미션에 <b>필요 없는</b> 물건이에요. 먹으면 체력은 회복돼요! 🤔</p>
+        <p style={{ margin:0, fontSize:14, fontWeight: 700 }}>
+          {difficulty === "hard" 
+            ? "미션에 필요 없는 물건이에요. 먹으면 체력이 회복돼요! 🤔" 
+            : "미션에 필요 없는 물건이에요. 기분 전환으로 사먹을까요? 🤔"}
+        </p>
       </div>
       <div style={{ display:"flex", gap:10 }}>
         <button onClick={onSkip} className="clay-btn" style={{ ...S.btn(C.green), flex:1, fontSize:15 }}>✋ 안 살래요!</button>
-        {ok?<button onClick={onBuy} className="clay-btn" style={{ ...S.btn(C.red), flex:1, fontSize:15 }}>😋 살래요! (+{tempt.heal} 체력)</button>
+        {ok?<button onClick={onBuy} className="clay-btn" style={{ ...S.btn(C.red), flex:1, fontSize:15 }}>
+          {difficulty === "hard" ? `😋 살래요! (+${tempt.heal} 체력)` : "😋 살래요!"}
+        </button>
           :<button disabled className="clay-btn" style={{ ...S.btn(C.gray), flex:1, fontSize:15, opacity:0.5, cursor:"default" }}>💸 부족</button>}
       </div>
     </div>
@@ -1342,7 +1391,7 @@ export default function App() {
             }}
           />
         )}
-        {screen==="temptation"&&curTemp && <TemptationScreen tempt={curTemp} budget={mission.budget} spent={spent} onBuy={()=>{
+        {screen==="temptation"&&curTemp && <TemptationScreen tempt={curTemp} budget={mission.budget} spent={spent} difficulty={difficulty} onBuy={()=>{
           playSFX("coin");
           setTBought(tb=>[...tb,curTemp]);
           setSpent(s=>s+curTemp.price);
