@@ -604,9 +604,6 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
           {/* 한글 랜드마크 및 지역 텍스트 */}
           <g opacity="0.8" style={{ pointerEvents: "none" }}>
-            <text x="520" y="140" fontSize="14" fill="#2E7D32" fontWeight="900" textAnchor="middle">북한산 국립공원</text>
-            <text x="500" y="445" fontSize="13" fill="#37474F" fontWeight="900" textAnchor="middle">🗼 N서울타워</text>
-            <text x="460" y="270" fontSize="12" fill="#5D4037" fontWeight="900" textAnchor="middle">🏯 경복궁</text>
             <text x="490" y="565" fontSize="16" fill="#1565C0" fontWeight="900" letterSpacing="6" textAnchor="middle">한 강</text>
 
             <text x="180" y="480" fontSize="11" fill="#78909C" fontWeight="800" textAnchor="middle">마포</text>
@@ -658,9 +655,9 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
           {/* 출발지 3D 핀 렌더링 */}
           {district && (
             <g transform={`translate(${startCoord.x}, ${startCoord.y})`} style={{ pointerEvents: "none" }}>
-              <image href="/images/start_pin.png" x="-32" y="-64" width="64" height="64" />
-              <rect x="-40" y="8" width="80" height="18" rx="9" fill={C.red} stroke={C.white} strokeWidth="1.5" />
-              <text x="0" y="17" fontSize="10" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">
+              <image href="/images/start_pin.png" x="-42" y="-84" width="84" height="84" />
+              <rect x="-40" y="10" width="80" height="18" rx="9" fill={C.red} stroke={C.white} strokeWidth="1.5" />
+              <text x="0" y="19" fontSize="10" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">
                 📍 {district.name}
               </text>
             </g>
@@ -685,8 +682,8 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
             const isHovered = hoveredPin === loc.id;
             const showTooltip = isSel || isHovered;
 
-            const pw = 68;
-            const ph = 68;
+            const pw = 88;
+            const ph = 88;
             const px = cx - pw/2;
             const py = cy - ph;
 
@@ -731,7 +728,7 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
                 {/* 방문 완료 체크 배지 (마우스 반응 차단) */}
                 {iv && (
-                  <g transform={`translate(${cx + 14}, ${cy - ph + 10})`} style={{ pointerEvents: "none" }}>
+                  <g transform={`translate(${cx + 20}, ${cy - ph + 12})`} style={{ pointerEvents: "none" }}>
                     <circle cx="0" cy="0" r="9" fill={C.green} stroke={C.white} strokeWidth="1.5"/>
                     <text x="0" y="1" fontSize="9" fill={C.white} fontWeight="900" textAnchor="middle" dominantBaseline="central">✓</text>
                   </g>
@@ -739,10 +736,10 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
                 {/* 실질적 마우스 이벤트 감지 투명 히트박스 (레이아웃 변동 없는 이벤트 수신기) */}
                 <rect
-                  x={cx - 45}
-                  y={cy - 68}
-                  width="90"
-                  height="85"
+                  x={cx - 50}
+                  y={cy - 88}
+                  width="100"
+                  height="105"
                   fill="transparent"
                   style={{ cursor: iv ? "default" : "pointer" }}
                   onClick={() => !iv && handlePinClick(loc)}
