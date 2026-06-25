@@ -431,11 +431,11 @@ function clampPan(x, y, s) {
 
 // ─── Seoul Map ───
 function SeoulMap({ locations, onPin, visited, selPin, district }) {
-  const [scale, setScale] = useState(1.1);
-  const [pan, setPan] = useState(() => clampPan(-100, -100, 1.1));
+  const [scale, setScale] = useState(1.0);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [start, setStart] = useState({ x: 0, y: 0 });
-  const [startPan, setStartPan] = useState({ x: -100, y: -100 });
+  const [startPan, setStartPan] = useState({ x: 0, y: 0 });
   const [hoveredPin, setHoveredPin] = useState(null);
   const movedRef = useRef(false);
   const pinchRef = useRef(null);
@@ -470,9 +470,25 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
 
   const handleWheel = (e) => {
     e.preventDefault();
-    const nextScale = Math.min(2.5, Math.max(1.0, scale - e.deltaY * 0.0015));
+    const svg = svgRef.current;
+    if (!svg) return;
+    const rect = svg.getBoundingClientRect();
+    
+    // 마우스 포인터가 위치한 곳의 SVG 좌표 구하기
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const viewX = mouseX * (1000 / rect.width);
+    const viewY = mouseY * (1000 / rect.height);
+    
+    const factor = e.deltaY > 0 ? 0.9 : 1.1;
+    const nextScale = Math.min(2.5, Math.max(1.0, scale * factor));
+    
+    setPan(p => {
+      const nextX = viewX - (viewX - p.x) * (nextScale / scale);
+      const nextY = viewY - (viewY - p.y) * (nextScale / scale);
+      return clampPan(nextX, nextY, nextScale);
+    });
     setScale(nextScale);
-    setPan(clampPan(pan.x, pan.y, nextScale));
   };
 
   // ── Touch handlers (mobile) ──
@@ -582,7 +598,7 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
         viewBox="0 0 1000 1000" 
         style={{ width: "100%", height: "100%", userSelect: "none" }}
       >
-        <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`} style={{ transformOrigin: "50% 50%", transition: isDragging ? "none" : "transform 0.1s ease-out" }}>
+        <g transform={`translate(${pan.x}, ${pan.y}) scale(${scale})`} style={{ transformOrigin: "0 0", transition: isDragging ? "none" : "transform 0.1s ease-out" }}>
           {/* 서울 그림 지도 일러스트 배경 */}
           <image href="/images/seoul_game_map.png" x="0" y="0" width="1000" height="1000" opacity="0.45" />
 
@@ -740,9 +756,27 @@ function SeoulMap({ locations, onPin, visited, selPin, district }) {
       </svg>
       {/* 줌 컨트롤 버튼 */}
       <div style={{ position: "absolute", top: 12, right: 12, display: "flex", flexDirection: "column", gap: 4, zIndex: 10 }}>
-        <button onClick={(e) => { e.stopPropagation(); const ns = Math.min(2.5, scale + 0.3); setScale(ns); setPan(clampPan(pan.x, pan.y, ns)); }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>+</button>
-        <button onClick={(e) => { e.stopPropagation(); const ns = Math.max(1.0, scale - 0.3); setScale(ns); setPan(clampPan(pan.x, pan.y, ns)); }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>−</button>
-        {scale > 1.15 && <button onClick={(e) => { e.stopPropagation(); setScale(1.1); setPan(clampPan(-100, -100, 1.1)); }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>↺</button>}
+        <button onClick={(e) => {
+          e.stopPropagation();
+          const ns = Math.min(2.5, scale + 0.3);
+          const nextX = 500 - (500 - pan.x) * (ns / scale);
+          const nextY = 500 - (500 - pan.y) * (ns / scale);
+          setPan(clampPan(nextX, nextY, ns));
+          setScale(ns);
+        }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>+</button>
+        <button onClick={(e) => {
+          e.stopPropagation();
+          const ns = Math.max(1.0, scale - 0.3);
+          const nextX = 500 - (500 - pan.x) * (ns / scale);
+          const nextY = 500 - (500 - pan.y) * (ns / scale);
+          setPan(clampPan(nextX, nextY, ns));
+          setScale(ns);
+        }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 18, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>−</button>
+        {scale > 1.05 && <button onClick={(e) => {
+          e.stopPropagation();
+          setScale(1.0);
+          setPan({ x: 0, y: 0 });
+        }} style={{ width: 36, height: 36, borderRadius: 10, border: `1.5px solid ${C.grayLight}`, background: "rgba(255,255,255,0.95)", fontSize: 14, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 6px rgba(0,0,0,0.1)" }}>↺</button>}
       </div>
       {/* 지도 조작 가이드 */}
       <div style={{ position: "absolute", bottom: 12, right: 12, background: "rgba(255,255,255,0.95)", borderRadius: 10, padding: "6px 12px", fontSize: 11, pointerEvents: "none", boxShadow: "0 2px 8px rgba(0,0,0,0.1)", border: `1px solid ${C.grayLight}`, display: "flex", gap: 8, fontWeight: "bold" }}>
