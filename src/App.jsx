@@ -307,7 +307,8 @@ function IntroScreen({ onStart }) {
   );
 }
 
-function DifficultyScreen({ onSelect }) {
+function DifficultyScreen({ onSelect, easyPlayCount }) {
+  const isLocked = easyPlayCount < 3;
   return (
     <div>
       <h2 style={{ fontSize:22, fontWeight:900, textAlign:"center", margin:"20px 0 6px" }}>⚡ 난이도 선택</h2>
@@ -320,10 +321,34 @@ function DifficultyScreen({ onSelect }) {
           </div>
           <p style={{ fontSize:13, color:C.textLight, margin:0, lineHeight:1.6, fontWeight: 600 }}>시장 3곳 + 마트 1곳에서 골라요.<br/>방문지는 최대 2곳! 체력 제약 없이 장보기에 집중해요.</p>
         </button>
-        <button onClick={()=>onSelect("hard")} className="clay-card-hover" style={{ ...S.card, cursor:"pointer", textAlign:"left", border:`3.5px solid ${C.red}`, display:"block", width:"100%", padding:20 }}>
+        <button 
+          disabled={isLocked}
+          onClick={()=>!isLocked && onSelect("hard")} 
+          className={isLocked ? "" : "clay-card-hover"} 
+          style={{ 
+            ...S.card, 
+            cursor: isLocked ? "not-allowed" : "pointer", 
+            textAlign:"left", 
+            border:`3.5px solid ${isLocked ? C.gray : C.red}`, 
+            display:"block", 
+            width:"100%", 
+            padding:20,
+            opacity: isLocked ? 0.6 : 1,
+            position: "relative"
+          }}
+        >
           <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
-            <span style={{ fontSize:38 }}>🔥</span>
-            <div><div style={{ fontWeight:900, fontSize:18, color:C.red }}>어려움 모드</div><span style={S.tag(C.redLight,C.red)}>고급 도전자용</span></div>
+            <span style={{ fontSize:38 }}>{isLocked ? "🔒" : "🔥"}</span>
+            <div>
+              <div style={{ fontWeight:900, fontSize:18, color: isLocked ? C.grayDark : C.red }}>
+                어려움 모드 {isLocked && "(잠금)"}
+              </div>
+              {isLocked ? (
+                <span style={S.tag(C.grayLight, C.grayDark)}>쉬움 모드 완료 필요 ({easyPlayCount}/3회)</span>
+              ) : (
+                <span style={S.tag(C.redLight,C.red)}>고급 도전자용</span>
+              )}
+            </div>
           </div>
           <p style={{ fontSize:13, color:C.textLight, margin:0, lineHeight:1.6, fontWeight: 600 }}>시장 5곳 + 마트 3곳의 넓은 서울 맵!<br/>최대 3곳 방문 가능하며, <b>🏃 체력 관리</b>도 필요해요.</p>
         </button>
@@ -1294,6 +1319,13 @@ export default function App() {
   const [discountLocs, setDiscountLocs] = useState([]);
   const [solvedLocs, setSolvedLocs] = useState([]);
   const [dashboardOpen, setDashboardOpen] = useState(false);
+  const [easyPlayCount, setEasyPlayCount] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("easy_play_count");
+      return saved ? parseInt(saved, 10) || 0 : 0;
+    }
+    return 0;
+  });
 
   const locations = difficulty ? ALL_LOCATIONS.filter(l => difficulty==="hard" || l.mode==="easy") : [];
 
@@ -1323,6 +1355,20 @@ export default function App() {
     if(avail.length>0){const t=pick(avail);setCurTemp(t);setUsedT(u=>[...u,t.name]);setScreen("temptation");}
     else setScreen("map");
   },[usedT]);
+
+  const finishShopping = useCallback(() => {
+    playSFX("success");
+    if (difficulty === "easy") {
+      setEasyPlayCount(prev => {
+        const next = prev + 1;
+        if (typeof window !== "undefined") {
+          localStorage.setItem("easy_play_count", next);
+        }
+        return next;
+      });
+    }
+    setScreen("result");
+  }, [difficulty]);
 
   const showBar = screen!=="intro"&&screen!=="difficulty"&&screen!=="mission"&&screen!=="district"&&screen!=="briefing"&&mission;
 
@@ -1397,11 +1443,11 @@ export default function App() {
       <div className="game-container-mobile" style={{ ...S.container, minHeight: "auto", padding: "16px 16px 32px" }}>
         {showBar && <TopBar budget={mission.budget} spent={spent} transportTotal={transportSpent} difficulty={difficulty} stamina={stamina}/>}
         {screen==="intro" && <IntroScreen onStart={()=>{playSFX("success");setScreen("difficulty")}}/>}
-        {screen==="difficulty" && <DifficultyScreen onSelect={d=>{playSFX("coin");setDifficulty(d);setScreen("mission")}}/>}
+        {screen==="difficulty" && <DifficultyScreen easyPlayCount={easyPlayCount} onSelect={d=>{playSFX("coin");setDifficulty(d);setScreen("mission")}}/>}
         {screen==="mission" && <MissionScreen onSelect={m=>{playSFX("coin");setMission(m);setCart([]);setSpent(0);setTransportSpent(0);setStamina(100);setVisited([]);setTBought([]);setTResisted(0);setUsedT([]);setScreen("district")}}/>}
         {screen==="district" && <DistrictScreen onSelect={d=>{playSFX("success");setDistrict(d);setScreen("briefing")}}/>}
         {screen==="briefing"&&mission&&district && <BriefingScreen mission={mission} district={district} difficulty={difficulty} onGo={()=>{playSFX("success");setScreen("map")}} />}
-        {screen==="map"&&mission&&district && <MapScreen mission={mission} visited={visited} cart={cart} spent={spent} district={district} difficulty={difficulty} stamina={stamina} locations={locations} onVisit={visitLoc} onFinish={()=>{playSFX("success");setScreen("result")}}/>}
+        {screen==="map"&&mission&&district && <MapScreen mission={mission} visited={visited} cart={cart} spent={spent} district={district} difficulty={difficulty} stamina={stamina} locations={locations} onVisit={visitLoc} onFinish={finishShopping}/>}
         {screen==="shopping"&&curLoc&&mission&&district && (
           <ShoppingScreen 
             key={curLoc.id}
